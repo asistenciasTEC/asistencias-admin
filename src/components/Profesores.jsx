@@ -6,13 +6,28 @@ import { v4 as uuid } from 'uuid';
 
 function Profesores() {
     const [profesores, setProfesores] = useState([]);
-    const [id, setId] = useState("");
-    const [nombre, setNombre] = useState("");
-    const [email, setEmail] = useState("");
-    const [contrasenna, setContrasenna] = useState("");
+    const [dataForm, setDataForm] = useState({
+        id: "",
+        nombre: "",
+        email: "",
+        password: ""
+    });
     const [showModal, setShowModal] = useState(false);
     const [modalTitle, setModalTitle] = useState("");
     const [modalAction, setModalAction] = useState("");
+
+    const {
+        id,
+        nombre,
+        email,
+        password } = dataForm;
+
+    const handleChange = (e) => {
+        setDataForm({
+            ...dataForm,
+            [e.target.id]: e.target.value
+        })
+    }
 
     useEffect(() => {
         const obtenerProfesores = async () => {
@@ -30,26 +45,22 @@ function Profesores() {
         if (accion === "agregar") {
             setModalTitle("Agregar profesor");
             setModalAction("Agregar");
-            setId("");
-            setNombre("");
-            setEmail("");
-            setContrasenna("");
+            setDataForm({
+                id: "",
+                nombre: "",
+                email: "",
+                password: ""
+            });
         } else if (accion === "editar") {
             const profesor = profesores.find((profesor) => profesor.id === id);
             setModalTitle("Editar profesor");
             setModalAction("Guardar cambios");
-            setId(profesor.id);
-            setNombre(profesor.nombre);
-            setEmail(profesor.email);
-            setContrasenna(profesor.contrasenna);
-        } else if (accion === "info") {
-            const profesor = profesores.find((profesor) => profesor.id === id);
-            setModalTitle("Info profesor");
-            setModalAction("Info");
-            setId(profesor.id);
-            setNombre(profesor.nombre);
-            setEmail(profesor.email);
-            setContrasenna(profesor.contrasenna)
+            setDataForm({
+                id: profesor.id,
+                nombre: profesor.nombre,
+                email: profesor.email,
+                password: profesor.password
+            });
         }
         setShowModal(true);
     };
@@ -59,9 +70,8 @@ function Profesores() {
     };
 
     const agregarProfesor = async (e) => {
-        console.log("hola")
         e.preventDefault();
-        const nuevoProfesor = { id: uuid(), nombre, email, contrasenna };
+        const nuevoProfesor = { id: uuid(), nombre, email, password };
         await addDoc(collection(db, "profesores"), nuevoProfesor);
         setProfesores([...profesores, nuevoProfesor]);
         cerrarModal();
@@ -69,7 +79,7 @@ function Profesores() {
 
     const editarProfesor = async (e) => {
         e.preventDefault();
-        const profesorActualizado = { nombre, email, contrasenna };
+        const profesorActualizado = { nombre, email, password };
         const q = query(collection(db, "profesores"), where("id", "==", id));
         const querySnapshot = await getDocs(q);
 
@@ -131,9 +141,6 @@ function Profesores() {
                                 </Button>{" "}
                                 <Button variant="danger" onClick={() => eliminarProfesor(profesor.id)}>
                                     Eliminar
-                                </Button>{" "}
-                                <Button variant="info" onClick={() => abrirModal("info", profesor.id)}>
-                                    Info
                                 </Button>
                             </td>
                         </tr>
@@ -146,14 +153,15 @@ function Profesores() {
                     <Modal.Title>{modalTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={id ? editarProfesor : agregarProfesor}>
+                    <Form id="form1" onSubmit={id ? editarProfesor : agregarProfesor}>
                         <Form.Group className="mb-3" controlId="nombre">
                             <Form.Label>Nombre completo</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Escribe el nombre completo del profesor"
                                 value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
+                                onChange={handleChange}
+                                autoComplete='off'
                                 required
                             />
                         </Form.Group>
@@ -164,29 +172,32 @@ function Profesores() {
                                 type="email"
                                 placeholder="Escribe el e-mail del profesor"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={handleChange}
+                                autoComplete='off'
                                 required
                             />
                         </Form.Group>
 
-                        <Form.Group className="mb-3" controlId="contrasenna">
+                        <Form.Group className="mb-3" controlId="password">
                             <Form.Label>Contraseña</Form.Label>
                             <Form.Control
                                 type="password"
                                 placeholder="Escribe la contraseña del profesor"
-                                value={contrasenna}
-                                onChange={(e) => setContrasenna(e.target.value)}
+                                value={password}
+                                onChange={handleChange}
                                 required={!id}
                             />
                         </Form.Group>
-                        <Button variant="primary" type="submit">
-                            {modalAction}
-                        </Button>{" "}
-                        <Button variant="secondary" onClick={cerrarModal}>
-                            Cancelar
-                        </Button>{" "}
                     </Form>
                 </Modal.Body>
+                <Modal.Footer>
+                    <Button form="form1" variant="primary" type="submit">
+                        {modalAction}
+                    </Button>{" "}
+                    <Button variant="secondary" onClick={cerrarModal}>
+                        Cancelar
+                    </Button>{" "}
+                </Modal.Footer>
             </Modal>
         </div>
     );
