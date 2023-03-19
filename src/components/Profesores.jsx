@@ -42,14 +42,6 @@ function Profesores() {
             setNombre(profesor.nombre);
             setEmail(profesor.email);
             setContrasenna(profesor.contrasenna);
-        } else if (accion === "info") {
-            const profesor = profesores.find((profesor) => profesor.id === id);
-            setModalTitle("Info profesor");
-            setModalAction("Info");
-            setId(profesor.id);
-            setNombre(profesor.nombre);
-            setEmail(profesor.email);
-            setContrasenna(profesor.contrasenna)
         }
         setShowModal(true);
     };
@@ -59,7 +51,6 @@ function Profesores() {
     };
 
     const agregarProfesor = async (e) => {
-        console.log("hola")
         e.preventDefault();
         const nuevoProfesor = { id: uuid(), nombre, email, contrasenna };
         await addDoc(collection(db, "profesores"), nuevoProfesor);
@@ -131,9 +122,6 @@ function Profesores() {
                                 </Button>{" "}
                                 <Button variant="danger" onClick={() => eliminarProfesor(profesor.id)}>
                                     Eliminar
-                                </Button>{" "}
-                                <Button variant="info" onClick={() => abrirModal("info", profesor.id)}>
-                                    Info
                                 </Button>
                             </td>
                         </tr>
@@ -146,7 +134,7 @@ function Profesores() {
                     <Modal.Title>{modalTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={id ? editarProfesor : agregarProfesor}>
+                    <Form id="form1" onSubmit={id ? editarProfesor : agregarProfesor}>
                         <Form.Group className="mb-3" controlId="nombre">
                             <Form.Label>Nombre completo</Form.Label>
                             <Form.Control
@@ -179,14 +167,16 @@ function Profesores() {
                                 required={!id}
                             />
                         </Form.Group>
-                        <Button variant="primary" type="submit">
-                            {modalAction}
-                        </Button>{" "}
-                        <Button variant="secondary" onClick={cerrarModal}>
-                            Cancelar
-                        </Button>{" "}
                     </Form>
                 </Modal.Body>
+                <Modal.Footer>
+                    <Button form="form1" variant="primary" type="submit">
+                        {modalAction}
+                    </Button>{" "}
+                    <Button variant="secondary" onClick={cerrarModal}>
+                        Cancelar
+                    </Button>{" "}
+                </Modal.Footer>
             </Modal>
         </div>
     );
