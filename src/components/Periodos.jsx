@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { Table, Modal, Form, Button } from "react-bootstrap";
+import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 import { v4 as uuid } from 'uuid';
 
+//librería de mensajes información
+import { toast, ToastContainer } from "react-toastify";
+
+//librería de iconos boostrap para react
+import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { SiAddthis } from "react-icons/si";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -50,7 +56,6 @@ const Periodos = () => {
 
   const abrirModal = (accion, id) => {
     if (accion === "agregar") {
-      console.log(id)
       setModalTitle("Agregar periodo");
       setModalAction("Agregar");
       setDataForm({
@@ -64,7 +69,6 @@ const Periodos = () => {
       });
 
     } else if (accion === "editar") {
-      console.log(id)
       const periodo = periodos.find((periodo) => periodo.id === id);
       setModalTitle("Editar periodo");
       setModalAction("Guardar cambios");
@@ -85,19 +89,36 @@ const Periodos = () => {
     setShowModal(false);
   };
 
+  function buscarPeriodo(year, semestre) {
+    for (let index = 0; index < periodos.length; index++) {
+      console.log(periodos[index].year, periodos[index].semestre)
+    }
+
+
+    for (let i = 0; i < periodos.length; i++) {
+      if (periodos[i].year === year && periodos[i].semestre === semestre) {
+        return periodos[i];
+      }
+      return null;
+    }
+  }
+
   const agregarPeriodo = async (e) => {
-    console.log("Agrega")
     e.preventDefault();
     const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
-    await addDoc(collection(db, "periodos"), nuevoPeriodo);
-    setPeriodos([...periodos, nuevoPeriodo]);
-    cerrarModal();
+
+    if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
+      await addDoc(collection(db, "periodos"), nuevoPeriodo);
+      setPeriodos([...periodos, nuevoPeriodo]);
+      toast.success("Periodo agregado exitosamente.");
+      cerrarModal();
+    } else {
+      toast.error("El Periodo a agregar ya existe");
+    }
   };
 
   const editarPeriodo = async (e) => {
-    console.log("Edita")
     e.preventDefault();
-    console.log(id)
     const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
@@ -105,10 +126,10 @@ const Periodos = () => {
     querySnapshot.forEach((doc) => {
       updateDoc(doc.ref, periodoActualizado)
         .then(() => {
-          console.log("Document successfully updated!");
+          toast.success("Periodo editado exitosamente.");
         })
         .catch((error) => {
-          console.error("Error updating document: ", error);
+          toast.error("Ha ocurrido un error.");
         });
     });
     const listaPeriodosActualizada = periodos.map((periodo) =>
@@ -125,24 +146,68 @@ const Periodos = () => {
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
         .then(() => {
-          console.log("Document successfully deleted!");
+          toast.success("Periodo eliminado exitosamente.");
         })
         .catch((error) => {
-          console.error("Error removing document: ", error);
+          toast.error("Ha ocurrido un error.");
         });
     });
     const listaPeriodosActualizada = periodos.filter((periodo) => periodo.id !== id);
     setPeriodos(listaPeriodosActualizada);
   };
 
+  //Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(periodos.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = periodos.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
-    <div>
+    <div className="container-lg ">
       <h1>Periodos</h1>
-      <Button variant="primary" onClick={() => abrirModal("agregar")}>
-        Agregar Periodo
-      </Button>
+      <div className="row">
+        <div className="col">
+          <Button
+            className=" m-1 align-content-center fs-4"
+            variant="primary"
+            onClick={() => abrirModal("agregar")}
+          >
+            <SiAddthis />
+          </Button>
+        </div>
+        <div className="col">
+          <div className="row">
+            <div className="col">
+              <Form.Select aria-label="Default select example">
+                <option>Filtros</option>
+                <option value="Nombre">Opción 1</option>
+                <option value="opcion2">Opción 2</option>
+                <option value="opcion3">Opción 3</option>
+              </Form.Select>
+            </div>
+            <div className="col">
+              <Form className="d-sm-flex">
+                <Form.Control
+                  type="search"
+                  placeholder="Search"
+                  className="me-2"
+                  aria-label="Search"
+                />
+                <Button variant="outline-success">Search</Button>
+              </Form>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Table striped bordered hover>
-        <thead>
+        <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Año</th>
             <th>Semestre</th>
@@ -150,10 +215,11 @@ const Periodos = () => {
             <th>Horas Especial</th>
             <th>Horas Estudiante</th>
             <th>Horas Tutoria</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {periodos.map((periodo) => (
+          {currentItems.map((periodo) => (
             <tr key={periodo.id}>
               <td>{periodo.year}</td>
               <td>{periodo.semestre}</td>
@@ -162,18 +228,45 @@ const Periodos = () => {
               <td>{periodo.horasEstudiante}</td>
               <td>{periodo.horasTutoria}</td>
               <td>
-                <Button variant="warning" onClick={() => abrirModal("editar", periodo.id)}>
-                  Editar
+                <Button
+                  className="px-2 py-1 mx-1 fs-5"
+                  variant="warning"
+                  onClick={() => abrirModal("editar", periodo.id)}
+                >
+                  <AiFillEdit />
                 </Button>
-                {" "}
-                <Button variant="danger" onClick={() => eliminarPeriodo(periodo.id)}>
-                  Eliminar
+                <Button
+                  className="px-2 py-1 mx-1 fs-5"
+                  variant="danger"
+                  onClick={() => eliminarPeriodo(periodo.id)}
+                >
+                  <AiFillDelete />
                 </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
+
+      <Pagination className="justify-content-center">
+        <Pagination.Prev
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        />
+        {[...Array(totalPages)].map((_, index) => (
+          <Pagination.Item
+            key={index}
+            active={index + 1 === currentPage}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+        <Pagination.Next
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        />
+      </Pagination>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
@@ -184,11 +277,12 @@ const Periodos = () => {
             <Form.Group className="mb-3" controlId="year">
               <Form.Label>Año</Form.Label>
               <Form.Control
-                type="number"
+                type="year"
                 placeholder="Escribe el año del periodo"
                 value={year}
                 onChange={handleChange}
                 autoComplete='off'
+                disabled
                 required
               />
             </Form.Group>
@@ -264,6 +358,7 @@ const Periodos = () => {
           </Button>{" "}
         </Modal.Footer>
       </Modal>
+      <ToastContainer />
     </div>
   );
 }
