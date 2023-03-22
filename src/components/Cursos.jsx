@@ -28,7 +28,9 @@ function Cursos() {
   });
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [show, setShow] = useState(false);
   const [modalAction, setModalAction] = useState("");
+  const [cursoEliminar, setCursoEliminar] = useState("");
 
   const { id, nombre, carrera, codigo } = dataForm;
   const handleChange = (e) => {
@@ -40,7 +42,7 @@ function Cursos() {
 
   useEffect(() => {
     const obtenerCursos = async () => {
-      const CursosCollection = collection(db, "Cursos");
+      const CursosCollection = collection(db, "cursos");
       const snapshot = await getDocs(CursosCollection);
       const listaCursos = snapshot.docs.map((doc) => ({
         ...doc.data(),
@@ -91,9 +93,9 @@ function Cursos() {
     const nuevocurso = { id: uuid(), nombre, carrera, codigo };
 
     if (buscarcurso(codigo) === null || Cursos.length === 0) {
-      await addDoc(collection(db, "Cursos"), nuevocurso);
+      await addDoc(collection(db, "cursos"), nuevocurso);
       setCursos([...Cursos, nuevocurso]);
-      toast.success("curso agregado exitosamente.");
+      toast.success("Curso agregado exitosamente.");
       cerrarModal();
     } else if (buscarcurso(codigo) !== null ) {
       console.log(buscarcurso(codigo));
@@ -104,13 +106,13 @@ function Cursos() {
   const editarcurso = async (e) => {
     e.preventDefault();
     const cursoActualizado = { nombre, carrera, codigo };
-    const q = query(collection(db, "Cursos"), where("id", "==", id));
+    const q = query(collection(db, "cursos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
       updateDoc(doc.ref, cursoActualizado)
         .then(() => {
-          toast.success("curso editado exitosamente.");
+          toast.success("Curso editado exitosamente.");
         })
         .catch((error) => {
           toast.error("Ha ocurrido un error.");
@@ -123,8 +125,19 @@ function Cursos() {
     cerrarModal();
   };
 
+  
+  const handleShow = (id) => {
+    setCursoEliminar(id);
+    setShow(true);
+  }
+
+  const handleConfirmar = () => {
+    eliminarcurso(cursoEliminar);
+    setShow(false);
+  }
+
   const eliminarcurso = async (id) => {
-    const q = query(collection(db, "Cursos"), where("id", "==", id));
+    const q = query(collection(db, "cursos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
@@ -218,7 +231,7 @@ function Cursos() {
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
-                  onClick={() => eliminarcurso(curso.id)}
+                  onClick={() => handleShow(curso.id)}
                 >
                   <FaUserTimes />
                 </Button>
@@ -226,7 +239,11 @@ function Cursos() {
             </tr>
           ))}
         </tbody>
+        
+
       </Table>
+
+      
 
       <Pagination className="justify-content-center">
         <Pagination.Prev
@@ -247,6 +264,23 @@ function Cursos() {
           onClick={() => handlePageChange(currentPage + 1)}
         />
       </Pagination>
+
+      <Modal show={show} onHide={() => setShow(false)}>
+            <Modal.Header closeButton>
+                <Modal.Title>Eliminar elemento</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                ¿Estás seguro de que quieres eliminar este elemento?
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShow(false)}>
+                    Cancelar
+                </Button>
+                <Button variant="danger" onClick={handleConfirmar}>
+                    Eliminar
+                </Button>
+            </Modal.Footer>
+        </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
