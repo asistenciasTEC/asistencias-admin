@@ -144,7 +144,7 @@ function Profesores() {
 
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(profesores.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -170,12 +170,12 @@ function Profesores() {
         <div className="col">
           <div className="row">
             <div className="col">
-              {/* <Form.Select aria-label="Default select example">
+              <Form.Select aria-label="Default select example">
                 <option>Filtros</option>
                 <option value="Nombre">Opción 1</option>
                 <option value="opcion2">Opción 2</option>
                 <option value="opcion3">Opción 3</option>
-              </Form.Select> */}
+              </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
