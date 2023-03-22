@@ -7,6 +7,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
@@ -19,16 +20,18 @@ import { FaUserEdit } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa";
 
 function Profesores() {
-  const [profesores, setProfesores] = useState([].sort());
+  const [profesores, setProfesores] = useState([]);
   const [dataForm, setDataForm] = useState({
     id: "",
     nombre: "",
     email: "",
     password: "",
   });
+  const [showModalEliminar, setShowModalEliminar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
+  const [profesorAEliminar, setProfesorAELiminar] = useState("");
 
   const { id, nombre, email, password } = dataForm;
   const handleChange = (e) => {
@@ -38,13 +41,29 @@ function Profesores() {
     });
   };
 
+  const handleDeleteClick = (id) => {
+    setProfesorAELiminar(id);
+    setShowModalEliminar(true);
+  };
+  
+  const handleConfirmClick = () => {
+    // Lógica para eliminar el elemento
+    eliminarProfesor(profesorAEliminar);
+    setShowModalEliminar(false);
+  };
+
   useEffect(() => {
     const obtenerProfesores = async () => {
       const profesoresCollection = collection(db, "profesores");
-      const snapshot = await getDocs(profesoresCollection);
-      const listaProfesores = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-      }));
+      const snapshot = await getDocs(
+        profesoresCollection,
+        orderBy("fecha", "desc")
+      );
+      const listaProfesores = snapshot.docs
+        .map((doc) => ({
+          ...doc.data(),
+        }))
+        .reverse();
       setProfesores(listaProfesores);
     };
     obtenerProfesores();
@@ -90,7 +109,7 @@ function Profesores() {
     e.preventDefault();
     const nuevoProfesor = { id: uuid(), nombre, email, password };
 
-    if (buscarProfesor(email) === null) {
+    if (buscarProfesor(email) === null || profesores.length === 0) {
       await addDoc(collection(db, "profesores"), nuevoProfesor);
       setProfesores([...profesores, nuevoProfesor]);
       toast.success("Profesor agregado exitosamente.");
@@ -181,11 +200,11 @@ function Profesores() {
               <Form className="d-sm-flex">
                 <Form.Control
                   type="search"
-                  placeholder="Search"
+                  placeholder="Buscar"
                   className="me-2"
                   aria-label="Search"
                 />
-                <Button variant="outline-success">Search</Button>
+                <Button variant="outline-success">Buscar</Button>
               </Form>
             </div>
           </div>
@@ -216,7 +235,7 @@ function Profesores() {
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
-                  onClick={() => eliminarProfesor(profesor.id)}
+                  onClick={() => handleDeleteClick(profesor.id)}
                 >
                   <FaUserTimes />
                 </Button>
@@ -245,6 +264,29 @@ function Profesores() {
           onClick={() => handlePageChange(currentPage + 1)}
         />
       </Pagination>
+
+      <Modal
+        show={showModalEliminar}
+        onHide={() => setShowModalEliminar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres eliminar este profesor?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEliminar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmClick}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
