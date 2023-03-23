@@ -14,9 +14,7 @@ import { v4 as uuid } from "uuid";
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 //librería de iconos boostrap para react
-import { FaUserTimes } from "react-icons/fa";
-import { FaUserEdit } from "react-icons/fa";
-import { FaUserPlus } from "react-icons/fa";
+import {MdEdit} from "react-icons/md";
 
 function Asistencias() {
   const [asistencias, setAsistencias] = useState([].sort());
@@ -121,7 +119,7 @@ function Asistencias() {
                   variant="warning"
                   onClick={() => abrirModal("editar", asistencia.id)}
                 >
-                  <FaUserEdit />
+                  <MdEdit/>
                 </Button>
               </td>
             </tr>
