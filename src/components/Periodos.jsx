@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, where, serverTimestamp, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 import { v4 as uuid } from 'uuid';
@@ -20,7 +20,8 @@ const Periodos = () => {
     horasAsistente: "",
     horasEspecial: "",
     horasEstudiante: "",
-    horasTutoria: ""
+    horasTutoria: "",
+    fecha: ""
   });
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -33,7 +34,9 @@ const Periodos = () => {
     horasAsistente,
     horasEspecial,
     horasEstudiante,
-    horasTutoria } = dataForm;
+    horasTutoria,
+    fecha
+  } = dataForm;
 
   const handleChange = (e) => {
     setDataForm({
@@ -44,8 +47,8 @@ const Periodos = () => {
 
   useEffect(() => {
     const obtenerPeriodos = async () => {
-      const periodosCollection = collection(db, "periodos");
-      const snapshot = await getDocs(periodosCollection);
+      const queryPeriodosCollection = query(collection(db, "periodos"), orderBy("fecha", "desc"));
+      const snapshot = await getDocs(queryPeriodosCollection);
       const listaPeriodos = snapshot.docs.map((doc) => ({
         ...doc.data(),
       }));
@@ -65,7 +68,8 @@ const Periodos = () => {
         horasAsistente: "",
         horasEspecial: "",
         horasEstudiante: "",
-        horasTutoria: ""
+        horasTutoria: "",
+        fecha: ""
       });
 
     } else if (accion === "editar") {
@@ -80,6 +84,7 @@ const Periodos = () => {
         horasEspecial: periodo.horasEspecial,
         horasEstudiante: periodo.horasEstudiante,
         horasTutoria: periodo.horasTutoria,
+        fecha: periodo.fecha
       });
     }
     setShowModal(true);
@@ -105,11 +110,11 @@ const Periodos = () => {
 
   const agregarPeriodo = async (e) => {
     e.preventDefault();
-    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
+    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha: serverTimestamp() };
 
     if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
       await addDoc(collection(db, "periodos"), nuevoPeriodo);
-      setPeriodos([...periodos, nuevoPeriodo]);
+      setPeriodos([nuevoPeriodo, ...periodos]);
       toast.success("Periodo agregado exitosamente.");
       cerrarModal();
     } else {
@@ -119,7 +124,7 @@ const Periodos = () => {
 
   const editarPeriodo = async (e) => {
     e.preventDefault();
-    const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
+    const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
@@ -282,7 +287,6 @@ const Periodos = () => {
                 value={year}
                 onChange={handleChange}
                 autoComplete='off'
-                disabled
                 required
               />
             </Form.Group>
