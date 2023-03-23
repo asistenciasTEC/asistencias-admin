@@ -22,9 +22,12 @@ const Periodos = () => {
     horasTutoria: "",
     fecha: ""
   });
+  const [showModalEliminar, setShowModalEliminar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
+  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
+
 
   const {
     id,
@@ -43,6 +46,18 @@ const Periodos = () => {
       [e.target.id]: e.target.value
     })
   }
+
+
+  const handleDeleteClick = (id) => {
+    setPeriodoAELiminar(id);
+    setShowModalEliminar(true);
+  };
+
+  const handleConfirmClick = () => {
+    // Lógica para eliminar el elemento
+    eliminarPeriodo(periodoAEliminar);
+    setShowModalEliminar(false);
+  };
 
   useEffect(() => {
     const obtenerPeriodos = async () => {
@@ -244,7 +259,7 @@ const Periodos = () => {
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
-                  onClick={() => eliminarPeriodo(periodo.id)}
+                  onClick={() => handleDeleteClick(periodo.id)}
                 >
                   <MdDelete />
                 </Button>
@@ -274,6 +289,30 @@ const Periodos = () => {
         />
       </Pagination>
 
+      <Modal
+        show={showModalEliminar}
+        onHide={() => setShowModalEliminar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres eliminar este periodo?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEliminar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmClick}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
@@ -283,7 +322,9 @@ const Periodos = () => {
             <Form.Group className="mb-3" controlId="year">
               <Form.Label>Año</Form.Label>
               <Form.Control
-                type="year"
+                type="number"
+                min={1000}
+                max={9999}
                 placeholder="Escribe el año del periodo"
                 value={year}
                 onChange={handleChange}
@@ -295,7 +336,9 @@ const Periodos = () => {
             <Form.Group className="mb-3" controlId="semestre">
               <Form.Label>Semestre</Form.Label>
               <Form.Control
-                type="text"
+                type="number"
+                min={1}
+                max={2}
                 placeholder="Escribe el semestre del periodo"
                 value={semestre}
                 onChange={handleChange}
