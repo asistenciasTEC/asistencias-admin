@@ -8,8 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { AiFillEdit, AiFillDelete } from "react-icons/ai";
-import { SiAddthis } from "react-icons/si";
+import { MdAddBox, MdEdit, MdDelete, MdSearch } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -183,7 +182,7 @@ const Periodos = () => {
             variant="primary"
             onClick={() => abrirModal("agregar")}
           >
-            <SiAddthis />
+            <MdAddBox />
           </Button>
         </div>
         <div className="col">
@@ -204,7 +203,9 @@ const Periodos = () => {
                   className="me-2"
                   aria-label="Search"
                 />
-                <Button variant="outline-success">Search</Button>
+                <Button variant="outline-success">
+                  <MdSearch />
+                </Button>
               </Form>
             </div>
           </div>
@@ -238,14 +239,14 @@ const Periodos = () => {
                   variant="warning"
                   onClick={() => abrirModal("editar", periodo.id)}
                 >
-                  <AiFillEdit />
+                  <MdEdit />
                 </Button>
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
                   onClick={() => eliminarPeriodo(periodo.id)}
                 >
-                  <AiFillDelete />
+                  <MdDelete />
                 </Button>
               </td>
             </tr>
