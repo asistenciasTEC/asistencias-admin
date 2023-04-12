@@ -33,6 +33,9 @@ function Cursos() {
   const [valorSeleccionado, setValorSeleccionado] = useState("");
 
 
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [cursoAEditar, setCursoAEditar] = useState("");
+
   const { id, nombre, carrera, codigo } = dataForm;
   const handleChange = (e) => {
     setDataForm({
@@ -89,6 +92,19 @@ function Cursos() {
     }
   }
 
+  //Confirm update
+  const handleUpdateClick = (e) => {
+    e.preventDefault();
+    setCursoAEditar(e);
+    cerrarModal();
+    setShowModalEditar(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    editarcurso(cursoAEditar);
+    setShowModalEditar(false);
+  };
+
   const agregarcurso = async (e) => {
     e.preventDefault();
     const nuevocurso = { id: uuid(), nombre, carrera, codigo };
@@ -123,7 +139,6 @@ function Cursos() {
       curso.id === id ? { id: id, ...cursoActualizado } : curso
     );
     setCursos(listaCursosActualizada);
-    cerrarModal();
   };
 
   
@@ -329,13 +344,36 @@ function Cursos() {
                 </Button>
             </Modal.Footer>
         </Modal>
+      
+      <Modal
+        show={showModalEditar}
+        onHide={() => setShowModalEditar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar edición</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres editar este curso?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEditar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmUpdate}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarcurso : agregarcurso}>
+          <Form id="form1" onSubmit={id ? handleUpdateClick : agregarcurso}>
             <Form.Group className="mb-3" controlId="nombre">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
