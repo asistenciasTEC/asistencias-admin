@@ -333,7 +333,7 @@ function Cursos() {
                 <Modal.Title>Eliminar elemento</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                ¿Estás seguro de que quieres eliminar este elemento?
+                ¿Estas seguro de que quieres eliminar este elemento?
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShow(false)}>
