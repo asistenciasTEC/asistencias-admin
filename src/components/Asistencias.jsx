@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import {collection, query, where, getDocs, addDoc, updateDoc, deleteDoc} from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 import { v4 as uuid } from "uuid";
+
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
+
 //librería de iconos boostrap para react
 import {MdEdit} from "react-icons/md";
 
@@ -126,8 +120,6 @@ function Asistencias() {
           ))}
         </tbody>
       </Table>
-
-
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
