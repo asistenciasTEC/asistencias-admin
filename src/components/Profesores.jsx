@@ -111,7 +111,6 @@ function Profesores() {
       toast.success("Profesor agregado exitosamente.");
       cerrarModal();
     } else if (buscarProfesor(email) !== null) {
-      console.log(buscarProfesor(email));
       toast.error("El email a registrar ya existe");
     }
   };
@@ -175,7 +174,6 @@ function Profesores() {
     setCurrentPage(pageNumber);
   };
   const buscarEnLista = (terminoBusqueda) => {
-    console.log(valorSeleccionado);
     const resultadosBusq = [];
     if (
       valorSeleccionado === "default" ||
@@ -204,6 +202,7 @@ function Profesores() {
     const terminoBusqueda = event.target.value;
     buscarEnLista(terminoBusqueda);
   };
+
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }

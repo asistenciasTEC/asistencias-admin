@@ -12,7 +12,6 @@ import PrivateRoute from "./components/PrivateRoute";
 import AuthProvider from "./contexts/AuthContext";
 import NotFound from "./components/NotFound";
 
-
 function App() {
   return (
     <>
