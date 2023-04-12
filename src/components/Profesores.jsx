@@ -14,9 +14,7 @@ import { v4 as uuid } from "uuid";
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 //librería de iconos boostrap para react
-import { FaUserTimes } from "react-icons/fa";
-import { FaUserEdit } from "react-icons/fa";
-import { FaUserPlus } from "react-icons/fa";
+import { MdAddBox, MdEdit, MdDelete} from "react-icons/md";
 
 function Profesores() {
   const [profesores, setProfesores] = useState([]);
@@ -38,7 +36,7 @@ function Profesores() {
   const handleChange = (e) => {
     setDataForm({
       ...dataForm,
-      [e.target.id]: e.target.value,
+      [e.target.id]: e.target.value
     });
   };
 
@@ -104,10 +102,10 @@ function Profesores() {
   const agregarProfesor = async (e) => {
     e.preventDefault();
     const nuevoProfesor = { id: uuid(), nombre, email, password };
-
+    const nuevoProf = {id:nuevoProfesor.id, nombre:nuevoProfesor.nombre, email:nuevoProfesor.email.toLowerCase(), password:nuevoProfesor.password}
     if (buscarProfesor(email) === null || profesores.length === 0) {
-      await addDoc(collection(db, "profesores"), nuevoProfesor);
-      setProfesores([...profesores, nuevoProfesor]);
+      await addDoc(collection(db, "profesores"), nuevoProf);
+      setProfesores([nuevoProf,...profesores,]);
       toast.success("Profesor agregado exitosamente.");
       cerrarModal();
     } else if (buscarProfesor(email) !== null) {
@@ -190,8 +188,7 @@ function Profesores() {
     }
     if (valorSeleccionado === "correo") {
       for (let i = 0; i < profesores.length; i++) {
-        if (profesores[i].email === terminoBusqueda) {
-          console.log(terminoBusqueda);
+        if(profesores[i].email.toLowerCase()===terminoBusqueda.toLowerCase()){
           resultadosBusq.push(profesores[i]);
         }
       }
@@ -216,7 +213,7 @@ function Profesores() {
             variant="primary"
             onClick={() => abrirModal("agregar")}
           >
-            <FaUserPlus />
+            <MdAddBox />
           </Button>
         </div>
         <div className="col">
@@ -240,12 +237,6 @@ function Profesores() {
                   aria-label="Search"
                   onChange={handleBusqueda}
                 />
-                {/* <Button
-                  variant="outline-success"
-                  onClick={() => buscarEnLista()}
-                >
-                  Buscar
-                </Button> */}
               </Form>
             </div>
           </div>
@@ -271,14 +262,14 @@ function Profesores() {
                   variant="warning"
                   onClick={() => abrirModal("editar", profesor.id)}
                 >
-                  <FaUserEdit />
+                  <MdEdit />
                 </Button>
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
                   onClick={() => handleDeleteClick(profesor.id)}
                 >
-                  <FaUserTimes />
+                  <MdDelete />
                 </Button>
               </td>
             </tr>
