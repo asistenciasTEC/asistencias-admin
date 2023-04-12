@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdSearch} from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
