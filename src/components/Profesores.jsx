@@ -7,7 +7,6 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
-  orderBy,
 } from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
@@ -21,6 +20,7 @@ import { FaUserPlus } from "react-icons/fa";
 
 function Profesores() {
   const [profesores, setProfesores] = useState([]);
+
   const [dataForm, setDataForm] = useState({
     id: "",
     nombre: "",
@@ -32,7 +32,8 @@ function Profesores() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
   const [profesorAEliminar, setProfesorAELiminar] = useState("");
-
+  const [resultados, setResultados] = useState([]);
+  const [valorSeleccionado, setValorSeleccionado] = useState("");
   const { id, nombre, email, password } = dataForm;
   const handleChange = (e) => {
     setDataForm({
@@ -45,7 +46,7 @@ function Profesores() {
     setProfesorAELiminar(id);
     setShowModalEliminar(true);
   };
-  
+
   const handleConfirmClick = () => {
     // Lógica para eliminar el elemento
     eliminarProfesor(profesorAEliminar);
@@ -55,15 +56,10 @@ function Profesores() {
   useEffect(() => {
     const obtenerProfesores = async () => {
       const profesoresCollection = collection(db, "profesores");
-      const snapshot = await getDocs(
-        profesoresCollection,
-        orderBy("fecha", "desc")
-      );
-      const listaProfesores = snapshot.docs
-        .map((doc) => ({
-          ...doc.data(),
-        }))
-        .reverse();
+      const snapshot = await getDocs(profesoresCollection);
+      const listaProfesores = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }));
       setProfesores(listaProfesores);
     };
     obtenerProfesores();
@@ -164,15 +160,53 @@ function Profesores() {
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(profesores.length / itemsPerPage);
+  const totalPages =
+    resultados.length > 0
+      ? Math.ceil(resultados.length / itemsPerPage)
+      : Math.ceil(profesores.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = profesores.slice(startIndex, endIndex);
+  const currentItems =
+    resultados.length > 0
+      ? resultados.slice(startIndex, endIndex)
+      : profesores.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
+  const buscarEnLista = (terminoBusqueda) => {
+    console.log(valorSeleccionado);
+    const resultadosBusq = [];
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === "nombre" ||
+      valorSeleccionado === ""
+    ) {
+      for (let i = 0; i < profesores.length; i++) {
+        if (
+          profesores[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(profesores[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "correo") {
+      for (let i = 0; i < profesores.length; i++) {
+        if (profesores[i].email === terminoBusqueda) {
+          console.log(terminoBusqueda);
+          resultadosBusq.push(profesores[i]);
+        }
+      }
+    }
+    setResultados(resultadosBusq);
+  };
+  const handleBusqueda = (event) => {
+    const terminoBusqueda = event.target.value;
+    buscarEnLista(terminoBusqueda);
+  };
+  function handleSelectChange(event) {
+    setValorSeleccionado(event.target.value);
+  }
   return (
     <div className="container-lg ">
       <h1>Profesores</h1>
@@ -189,11 +223,13 @@ function Profesores() {
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select aria-label="Default select example">
-                <option>Filtros</option>
-                <option value="Nombre">Opción 1</option>
-                <option value="opcion2">Opción 2</option>
-                <option value="opcion3">Opción 3</option>
+              <Form.Select
+                aria-label="Default select example"
+                onChange={handleSelectChange}
+              >
+                <option value="default">Filtros</option>
+                <option value="nombre">Por nombre</option>
+                <option value="correo">Por correo</option>
               </Form.Select>
             </div>
             <div className="col">
@@ -203,8 +239,14 @@ function Profesores() {
                   placeholder="Buscar"
                   className="me-2"
                   aria-label="Search"
+                  onChange={handleBusqueda}
                 />
-                <Button variant="outline-success">Buscar</Button>
+                {/* <Button
+                  variant="outline-success"
+                  onClick={() => buscarEnLista()}
+                >
+                  Buscar
+                </Button> */}
               </Form>
             </div>
           </div>
