@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete, MdSearch } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -22,11 +22,16 @@ const Periodos = () => {
     horasTutoria: "",
     fecha: ""
   });
+
   const [showModalEliminar, setShowModalEliminar] = useState(false);
+  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
+
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [periodoAEditar, setPeriodoAEditar] = useState("");
+
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
-  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
 
   const {
     id,
@@ -58,16 +63,31 @@ const Periodos = () => {
     })
   }
 
+  //Confirm update
+  const handleUpdateClick = (e) => {
+    e.preventDefault();
+    setPeriodoAEditar(e);
+    cerrarModal();
+    setShowModalEditar(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    editarPeriodo(periodoAEditar);
+    setShowModalEditar(false);
+  };
+
+  //Confirm delete
   const handleDeleteClick = (id) => {
     setPeriodoAELiminar(id);
     setShowModalEliminar(true);
   };
 
-  const handleConfirmClick = () => {
+  const handleConfirmDelete = () => {
     eliminarPeriodo(periodoAEliminar);
     setShowModalEliminar(false);
   };
 
+  //Modal Form
   const abrirModal = (accion, id) => {
     if (accion === "agregar") {
       setModalTitle("Agregar periodo");
@@ -105,6 +125,7 @@ const Periodos = () => {
     setShowModal(false);
   };
 
+  //Buscar function
   function buscarPeriodo(year, semestre) {
     for (let index = 0; index < periodos.length; index++) {
       console.log(periodos[index].year, periodos[index].semestre)
@@ -134,6 +155,7 @@ const Periodos = () => {
   };
 
   const editarPeriodo = async (e) => {
+    console.log("Holaaaaaaaaa");
     e.preventDefault();
     const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha };
     const q = query(collection(db, "periodos"), where("id", "==", id));
@@ -152,7 +174,6 @@ const Periodos = () => {
       periodo.id === id ? { id: id, ...periodoActualizado } : periodo
     );
     setPeriodos(listaPeriodosActualizada);
-    cerrarModal();
   };
 
   const eliminarPeriodo = async (id) => {
@@ -187,7 +208,6 @@ const Periodos = () => {
   //Busqueda
 
   //Orden
-
 
   return (
     <div className="container-lg ">
@@ -311,8 +331,31 @@ const Periodos = () => {
           >
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleConfirmClick}>
-            Eliminar
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showModalEditar}
+        onHide={() => setShowModalEditar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar edición</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres editar este periodo?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEditar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmUpdate}>
+            Aceptar
           </Button>
         </Modal.Footer>
       </Modal>
@@ -322,7 +365,7 @@ const Periodos = () => {
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarPeriodo : agregarPeriodo}>
+          <Form id="form1" onSubmit={id ? handleUpdateClick : agregarPeriodo}>
             <Form.Group className="mb-3" controlId="year">
               <Form.Label>Año</Form.Label>
               <Form.Control
