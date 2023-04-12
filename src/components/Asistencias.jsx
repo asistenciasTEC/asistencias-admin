@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import {collection, query, where, getDocs, addDoc, updateDoc, deleteDoc} from "firebase/firestore";
-import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
+import {collection, query, where, getDocs, updateDoc} from "firebase/firestore";
+import { Table, Modal, Form, Button } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
-import { v4 as uuid } from "uuid";
 
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";

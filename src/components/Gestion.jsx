@@ -32,14 +32,12 @@ const Gestion = () => {
     horario: "",
     boleta: "",
     condicion: "",
-    horasAsignadas: "",
+    horasAsignadas: 0,
     fecha: ""
   });
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
-  const [modalAction, setModalAction] = useState("");
-  const [solicitudAEliminar, setsolicitudAELiminar] = useState("");
 
   const {
     id,
@@ -84,14 +82,9 @@ const Gestion = () => {
     })
   }
 
-  const handleDeleteClick = (id) => {
-    console.log (id)
-  };
-
-  const abrirModal = (accion, id) => {
+  const abrirModal = (id) => {
     const solicitud = solicitudes.find((solicitud) => solicitud.id === id);
       setModalTitle("Informacion de la solicitud");
-      setModalAction("Aprobar");
       setDataForm({
         id: solicitud.id,
         tipoAsistencia: solicitud.tipoAsistencia,
@@ -119,59 +112,91 @@ const Gestion = () => {
   };
 
   const cerrarModal = () => {
-    console.log (id)
     setShowModal(false);
   };
 
-
-
-
-
-
-
-  const aceptarSolicitud = async (e) => {
+  const gestionSolicitud = async (e) => {
     e.preventDefault();
-    const solicitudActualizado = { id,
-      tipoAsistencia,
-      cedula,
-      carne,
-      apellido1,
-      apellido2,
-      nombre,
-      promedioPondSemAnt,
-      créditosAproSemAnt,
-      correo,
-      telefono,
-      cuentaBancaria,
-      cuentaIBAN,
-      profesorAsistir,
-      cursoAsistir,
-      notaCursoAsistir,
-      horario,
-      boleta,
-      condicion,
-      horasAsignadas,
-      fecha };
-    const q = query(collection(db, "solicituds"), where("id", "==", id));
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-      updateDoc(doc.ref, solicitudActualizado)
-        .then(() => {
-          toast.success("solicitud aceptada exitosamente.");
-        })
-        .catch((error) => {
-          toast.error("Ha ocurrido un error.");
-        });
-    });
-    const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
-      solicitud.id === id ? { id: id, ...solicitudActualizado } : solicitud
-    );
-    setSolicitudes(listaSolicitudesActualizada);
-  };
-
-  const rechazarSolicitud = async (id) => {
-    console.log (id)
+    console.log("Hola")
+    console.log(cedula)
+    if (horasAsignadas !== 0) {
+      const solicitudActualizada = { id,
+        tipoAsistencia,
+        cedula,
+        carne,
+        apellido1,
+        apellido2,
+        nombre,
+        promedioPondSemAnt,
+        créditosAproSemAnt,
+        correo,
+        telefono,
+        cuentaBancaria,
+        cuentaIBAN,
+        profesorAsistir,
+        cursoAsistir,
+        notaCursoAsistir,
+        horario,
+        boleta,
+        condicion: "Aceptado",
+        horasAsignadas,
+        fecha };
+      const q = query(collection(db, "solicitudes"), where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+  
+      querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref, solicitudActualizada)
+          .then(() => {
+            toast.success("solicitud aceptada exitosamente.");
+          })
+          .catch((error) => {
+            toast.error("Ha ocurrido un error.");
+          });
+      });
+      const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
+        solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
+      );
+      setSolicitudes(listaSolicitudesActualizada);
+    } else {
+      const solicitudActualizada = { id,
+        tipoAsistencia,
+        cedula,
+        carne,
+        apellido1,
+        apellido2,
+        nombre,
+        promedioPondSemAnt,
+        créditosAproSemAnt,
+        correo,
+        telefono,
+        cuentaBancaria,
+        cuentaIBAN,
+        profesorAsistir,
+        cursoAsistir,
+        notaCursoAsistir,
+        horario,
+        boleta,
+        condicion: "Rechazado",
+        horasAsignadas,
+        fecha };
+      const q = query(collection(db, "solicitudes"), where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+  
+      querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref, solicitudActualizada)
+          .then(() => {
+            toast.success("Solicitud rechazada exitosamente.");
+          })
+          .catch((error) => {
+            toast.error("Ha ocurrido un error.");
+          });
+      });
+      const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
+        solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
+      );
+      setSolicitudes(listaSolicitudesActualizada);
+    }
+    cerrarModal();
   };
 
   //Paginación
@@ -252,7 +277,7 @@ const Gestion = () => {
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="info"
-                  onClick={() => abrirModal("editar", solicitud.id)}
+                  onClick={() => abrirModal(solicitud.id)}
                 >
                   <MdInfo />
                 </Button>
@@ -287,7 +312,7 @@ const Gestion = () => {
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={aceptarSolicitud}>
+          <Form id="form1" onSubmit={gestionSolicitud}>
             <Form.Group className="mb-3" controlId="tipoAsistencia">
               <Form.Label>Tipo de Asistencia</Form.Label>
               <Form.Control
@@ -517,7 +542,7 @@ const Gestion = () => {
               <Form.Label>Horas Asignadas</Form.Label>
               <Form.Control
                 type="number"
-                min={1}
+                min={0}
                 max={10}
                 value={horasAsignadas}
                 onChange={handleChange}
