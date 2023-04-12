@@ -19,23 +19,38 @@ import { FaUserEdit } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa";
 
 function Profesores() {
-  const [profesores, setProfesores] = useState([].sort());
+  const [profesores, setProfesores] = useState([]);
+
   const [dataForm, setDataForm] = useState({
     id: "",
     nombre: "",
     email: "",
     password: "",
   });
+  const [showModalEliminar, setShowModalEliminar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
-
+  const [profesorAEliminar, setProfesorAELiminar] = useState("");
+  const [resultados, setResultados] = useState([]);
+  const [valorSeleccionado, setValorSeleccionado] = useState("");
   const { id, nombre, email, password } = dataForm;
   const handleChange = (e) => {
     setDataForm({
       ...dataForm,
       [e.target.id]: e.target.value,
     });
+  };
+
+  const handleDeleteClick = (id) => {
+    setProfesorAELiminar(id);
+    setShowModalEliminar(true);
+  };
+
+  const handleConfirmClick = () => {
+    // Lógica para eliminar el elemento
+    eliminarProfesor(profesorAEliminar);
+    setShowModalEliminar(false);
   };
 
   useEffect(() => {
@@ -90,7 +105,7 @@ function Profesores() {
     e.preventDefault();
     const nuevoProfesor = { id: uuid(), nombre, email, password };
 
-    if (buscarProfesor(email) === null) {
+    if (buscarProfesor(email) === null || profesores.length === 0) {
       await addDoc(collection(db, "profesores"), nuevoProfesor);
       setProfesores([...profesores, nuevoProfesor]);
       toast.success("Profesor agregado exitosamente.");
@@ -145,15 +160,53 @@ function Profesores() {
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(profesores.length / itemsPerPage);
+  const totalPages =
+    resultados.length > 0
+      ? Math.ceil(resultados.length / itemsPerPage)
+      : Math.ceil(profesores.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = profesores.slice(startIndex, endIndex);
+  const currentItems =
+    resultados.length > 0
+      ? resultados.slice(startIndex, endIndex)
+      : profesores.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
+  const buscarEnLista = (terminoBusqueda) => {
+    console.log(valorSeleccionado);
+    const resultadosBusq = [];
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === "nombre" ||
+      valorSeleccionado === ""
+    ) {
+      for (let i = 0; i < profesores.length; i++) {
+        if (
+          profesores[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(profesores[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "correo") {
+      for (let i = 0; i < profesores.length; i++) {
+        if (profesores[i].email === terminoBusqueda) {
+          console.log(terminoBusqueda);
+          resultadosBusq.push(profesores[i]);
+        }
+      }
+    }
+    setResultados(resultadosBusq);
+  };
+  const handleBusqueda = (event) => {
+    const terminoBusqueda = event.target.value;
+    buscarEnLista(terminoBusqueda);
+  };
+  function handleSelectChange(event) {
+    setValorSeleccionado(event.target.value);
+  }
   return (
     <div className="container-lg ">
       <h1>Profesores</h1>
@@ -170,22 +223,30 @@ function Profesores() {
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select aria-label="Default select example">
-                <option>Filtros</option>
-                <option value="Nombre">Opción 1</option>
-                <option value="opcion2">Opción 2</option>
-                <option value="opcion3">Opción 3</option>
+              <Form.Select
+                aria-label="Default select example"
+                onChange={handleSelectChange}
+              >
+                <option value="default">Filtros</option>
+                <option value="nombre">Por nombre</option>
+                <option value="correo">Por correo</option>
               </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
                 <Form.Control
                   type="search"
-                  placeholder="Search"
+                  placeholder="Buscar"
                   className="me-2"
                   aria-label="Search"
+                  onChange={handleBusqueda}
                 />
-                <Button variant="outline-success">Search</Button>
+                {/* <Button
+                  variant="outline-success"
+                  onClick={() => buscarEnLista()}
+                >
+                  Buscar
+                </Button> */}
               </Form>
             </div>
           </div>
@@ -216,7 +277,7 @@ function Profesores() {
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
-                  onClick={() => eliminarProfesor(profesor.id)}
+                  onClick={() => handleDeleteClick(profesor.id)}
                 >
                   <FaUserTimes />
                 </Button>
@@ -245,6 +306,29 @@ function Profesores() {
           onClick={() => handlePageChange(currentPage + 1)}
         />
       </Pagination>
+
+      <Modal
+        show={showModalEliminar}
+        onHide={() => setShowModalEliminar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres eliminar este profesor?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEliminar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmClick}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>

@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { Table, Modal, Form, Button } from "react-bootstrap";
+import { collection, query, where, serverTimestamp, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
+import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 import { v4 as uuid } from 'uuid';
 
+//librería de mensajes información
+import { toast, ToastContainer } from "react-toastify";
+
+//librería de iconos boostrap para react
+import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -14,11 +19,14 @@ const Periodos = () => {
     horasAsistente: "",
     horasEspecial: "",
     horasEstudiante: "",
-    horasTutoria: ""
+    horasTutoria: "",
+    fecha: ""
   });
+  const [showModalEliminar, setShowModalEliminar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
+  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
 
   const {
     id,
@@ -27,19 +35,14 @@ const Periodos = () => {
     horasAsistente,
     horasEspecial,
     horasEstudiante,
-    horasTutoria } = dataForm;
-
-  const handleChange = (e) => {
-    setDataForm({
-      ...dataForm,
-      [e.target.id]: e.target.value
-    })
-  }
+    horasTutoria,
+    fecha
+  } = dataForm;
 
   useEffect(() => {
     const obtenerPeriodos = async () => {
-      const periodosCollection = collection(db, "periodos");
-      const snapshot = await getDocs(periodosCollection);
+      const queryPeriodosCollection = query(collection(db, "periodos"), orderBy("fecha", "desc"));
+      const snapshot = await getDocs(queryPeriodosCollection);
       const listaPeriodos = snapshot.docs.map((doc) => ({
         ...doc.data(),
       }));
@@ -48,9 +51,25 @@ const Periodos = () => {
     obtenerPeriodos();
   }, []);
 
+  const handleChange = (e) => {
+    setDataForm({
+      ...dataForm,
+      [e.target.id]: e.target.value
+    })
+  }
+
+  const handleDeleteClick = (id) => {
+    setPeriodoAELiminar(id);
+    setShowModalEliminar(true);
+  };
+
+  const handleConfirmClick = () => {
+    eliminarPeriodo(periodoAEliminar);
+    setShowModalEliminar(false);
+  };
+
   const abrirModal = (accion, id) => {
     if (accion === "agregar") {
-      console.log(id)
       setModalTitle("Agregar periodo");
       setModalAction("Agregar");
       setDataForm({
@@ -60,11 +79,11 @@ const Periodos = () => {
         horasAsistente: "",
         horasEspecial: "",
         horasEstudiante: "",
-        horasTutoria: ""
+        horasTutoria: "",
+        fecha: ""
       });
 
     } else if (accion === "editar") {
-      console.log(id)
       const periodo = periodos.find((periodo) => periodo.id === id);
       setModalTitle("Editar periodo");
       setModalAction("Guardar cambios");
@@ -76,6 +95,7 @@ const Periodos = () => {
         horasEspecial: periodo.horasEspecial,
         horasEstudiante: periodo.horasEstudiante,
         horasTutoria: periodo.horasTutoria,
+        fecha: periodo.fecha
       });
     }
     setShowModal(true);
@@ -85,30 +105,47 @@ const Periodos = () => {
     setShowModal(false);
   };
 
+  function buscarPeriodo(year, semestre) {
+    for (let index = 0; index < periodos.length; index++) {
+      console.log(periodos[index].year, periodos[index].semestre)
+    }
+
+    for (let i = 0; i < periodos.length; i++) {
+      if (periodos[i].year === year && periodos[i].semestre === semestre) {
+        return periodos[i];
+      }
+      return null;
+    }
+  }
+
+  //CRUD
   const agregarPeriodo = async (e) => {
-    console.log("Agrega")
     e.preventDefault();
-    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
-    await addDoc(collection(db, "periodos"), nuevoPeriodo);
-    setPeriodos([...periodos, nuevoPeriodo]);
-    cerrarModal();
+    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha: serverTimestamp() };
+
+    if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
+      await addDoc(collection(db, "periodos"), nuevoPeriodo);
+      setPeriodos([nuevoPeriodo, ...periodos]);
+      toast.success("Periodo agregado exitosamente.");
+      cerrarModal();
+    } else {
+      toast.error("El Periodo a agregar ya existe");
+    }
   };
 
   const editarPeriodo = async (e) => {
-    console.log("Edita")
     e.preventDefault();
-    console.log(id)
-    const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria };
+    const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
       updateDoc(doc.ref, periodoActualizado)
         .then(() => {
-          console.log("Document successfully updated!");
+          toast.success("Periodo editado exitosamente.");
         })
         .catch((error) => {
-          console.error("Error updating document: ", error);
+          toast.error("Ha ocurrido un error.");
         });
     });
     const listaPeriodosActualizada = periodos.map((periodo) =>
@@ -125,24 +162,78 @@ const Periodos = () => {
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
         .then(() => {
-          console.log("Document successfully deleted!");
+          toast.success("Periodo eliminado exitosamente.");
         })
         .catch((error) => {
-          console.error("Error removing document: ", error);
+          toast.error("Ha ocurrido un error.");
         });
     });
     const listaPeriodosActualizada = periodos.filter((periodo) => periodo.id !== id);
     setPeriodos(listaPeriodosActualizada);
   };
 
+  //Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(periodos.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = periodos.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  //Busqueda
+
+  //Orden
+
+
   return (
-    <div>
+    <div className="container-lg ">
       <h1>Periodos</h1>
-      <Button variant="primary" onClick={() => abrirModal("agregar")}>
-        Agregar Periodo
-      </Button>
+      <div className="row">
+        <div className="col">
+          <Button
+            className=" m-1 align-content-center fs-4"
+            variant="primary"
+            onClick={() => abrirModal("agregar")}
+          >
+            <MdAddBox />
+          </Button>
+        </div>
+        <div className="col">
+          <div className="row">
+            <div className="col">
+              <Form.Select defaultValue="0" aria-label="Default select example" >
+                <option value="0" disabled="disabled">Ordenar por:</option>
+                <option value="1">Año</option>
+                <option value="2">Semestre</option>
+                <option value="3">Horas Asistente</option>
+                <option value="4">Horas Especial</option>
+                <option value="5">Horas Estudiante</option>
+                <option value="6">Horas Tutoria</option>
+              </Form.Select>
+            </div>
+            <div className="col">
+              <Form className="d-sm-flex">
+                <Form.Control
+                  type="search"
+                  placeholder="Buscar..."
+                  className="me-2"
+                  aria-label="Search"
+                />
+                <Button variant="success">
+                  <MdSearch />
+                </Button>
+              </Form>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Table striped bordered hover>
-        <thead>
+        <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Año</th>
             <th>Semestre</th>
@@ -150,10 +241,11 @@ const Periodos = () => {
             <th>Horas Especial</th>
             <th>Horas Estudiante</th>
             <th>Horas Tutoria</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {periodos.map((periodo) => (
+          {currentItems.map((periodo) => (
             <tr key={periodo.id}>
               <td>{periodo.year}</td>
               <td>{periodo.semestre}</td>
@@ -162,18 +254,68 @@ const Periodos = () => {
               <td>{periodo.horasEstudiante}</td>
               <td>{periodo.horasTutoria}</td>
               <td>
-                <Button variant="warning" onClick={() => abrirModal("editar", periodo.id)}>
-                  Editar
+                <Button
+                  className="px-2 py-1 mx-1 fs-5"
+                  variant="warning"
+                  onClick={() => abrirModal("editar", periodo.id)}
+                >
+                  <MdEdit />
                 </Button>
-                {" "}
-                <Button variant="danger" onClick={() => eliminarPeriodo(periodo.id)}>
-                  Eliminar
+                <Button
+                  className="px-2 py-1 mx-1 fs-5"
+                  variant="danger"
+                  onClick={() => handleDeleteClick(periodo.id)}
+                >
+                  <MdDelete />
                 </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
+
+      <Pagination className="justify-content-center">
+        <Pagination.Prev
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        />
+        {[...Array(totalPages)].map((_, index) => (
+          <Pagination.Item
+            key={index}
+            active={index + 1 === currentPage}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+        <Pagination.Next
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        />
+      </Pagination>
+
+      <Modal
+        show={showModalEliminar}
+        onHide={() => setShowModalEliminar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres eliminar este periodo?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEliminar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmClick}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
@@ -185,6 +327,8 @@ const Periodos = () => {
               <Form.Label>Año</Form.Label>
               <Form.Control
                 type="number"
+                min={1000}
+                max={9999}
                 placeholder="Escribe el año del periodo"
                 value={year}
                 onChange={handleChange}
@@ -196,7 +340,9 @@ const Periodos = () => {
             <Form.Group className="mb-3" controlId="semestre">
               <Form.Label>Semestre</Form.Label>
               <Form.Control
-                type="text"
+                type="number"
+                min={1}
+                max={2}
                 placeholder="Escribe el semestre del periodo"
                 value={semestre}
                 onChange={handleChange}
@@ -264,6 +410,7 @@ const Periodos = () => {
           </Button>{" "}
         </Modal.Footer>
       </Modal>
+      <ToastContainer />
     </div>
   );
 }
