@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -22,11 +22,18 @@ const Periodos = () => {
     horasTutoria: "",
     fecha: ""
   });
+
   const [showModalEliminar, setShowModalEliminar] = useState(false);
+  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
+
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [periodoAEditar, setPeriodoAEditar] = useState("");
+
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
-  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
+  const [resultados, setResultados] = useState([]);
+  const [valorSeleccionado, setValorSeleccionado] = useState("");
 
   const {
     id,
@@ -58,16 +65,31 @@ const Periodos = () => {
     })
   }
 
+  //Confirm update
+  const handleUpdateClick = (e) => {
+    e.preventDefault();
+    setPeriodoAEditar(e);
+    cerrarModal();
+    setShowModalEditar(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    editarPeriodo(periodoAEditar);
+    setShowModalEditar(false);
+  };
+
+  //Confirm delete
   const handleDeleteClick = (id) => {
     setPeriodoAELiminar(id);
     setShowModalEliminar(true);
   };
 
-  const handleConfirmClick = () => {
+  const handleConfirmDelete = () => {
     eliminarPeriodo(periodoAEliminar);
     setShowModalEliminar(false);
   };
 
+  //Modal Form
   const abrirModal = (accion, id) => {
     if (accion === "agregar") {
       setModalTitle("Agregar periodo");
@@ -105,11 +127,8 @@ const Periodos = () => {
     setShowModal(false);
   };
 
+  //Buscar function
   function buscarPeriodo(year, semestre) {
-    for (let index = 0; index < periodos.length; index++) {
-      console.log(periodos[index].year, periodos[index].semestre)
-    }
-
     for (let i = 0; i < periodos.length; i++) {
       if (periodos[i].year === year && periodos[i].semestre === semestre) {
         return periodos[i];
@@ -152,7 +171,6 @@ const Periodos = () => {
       periodo.id === id ? { id: id, ...periodoActualizado } : periodo
     );
     setPeriodos(listaPeriodosActualizada);
-    cerrarModal();
   };
 
   const eliminarPeriodo = async (id) => {
@@ -175,19 +193,88 @@ const Periodos = () => {
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(periodos.length / itemsPerPage);
+  const totalPages =
+    resultados.length > 0
+      ? Math.ceil(resultados.length / itemsPerPage)
+      : Math.ceil(periodos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = periodos.slice(startIndex, endIndex);
+  const currentItems =
+    resultados.length > 0
+      ? resultados.slice(startIndex, endIndex)
+      : periodos.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  //Busqueda
+  const buscarEnLista = (terminoBusqueda) => {
+    const resultadosBusq = [];
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === ""
+    ) {
+      for (let i = 0; i < periodos.length; i++) {
+        if (
+          periodos[i].year.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          periodos[i].semestre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          periodos[i].horasAsistente.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          periodos[i].horasEspecial.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          periodos[i].horasEstudiante.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          periodos[i].horasTutoria.toLowerCase() === terminoBusqueda.toLowerCase()
 
-  //Orden
+        ) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "year") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].year === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "semestre") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].semestre === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "horasAsistente") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].horasAsistente === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "horasEspecial") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].horasEspecial === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "horasEstudiante") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].horasEstudiante === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    } else if (valorSeleccionado === "horasTutoria") {
+      for (let i = 0; i < periodos.length; i++) {
+        if (periodos[i].horasTutoria === terminoBusqueda) {
+          resultadosBusq.push(periodos[i]);
+        }
+      }
+    }
+    setResultados(resultadosBusq);
+  };
 
+  const handleBusqueda = (event) => {
+    const terminoBusqueda = event.target.value;
+    buscarEnLista(terminoBusqueda);
+  };
+
+  function handleSelectChange(event) {
+    setValorSeleccionado(event.target.value);
+  }
 
   return (
     <div className="container-lg ">
@@ -205,27 +292,28 @@ const Periodos = () => {
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select defaultValue="0" aria-label="Default select example" >
-                <option value="0" disabled="disabled">Ordenar por:</option>
-                <option value="1">Año</option>
-                <option value="2">Semestre</option>
-                <option value="3">Horas Asistente</option>
-                <option value="4">Horas Especial</option>
-                <option value="5">Horas Estudiante</option>
-                <option value="6">Horas Tutoria</option>
+              <Form.Select
+                aria-label="Default select example"
+                onChange={handleSelectChange}
+              >
+                <option value="default">Filtros</option>
+                <option value="year">Por Año</option>
+                <option value="semestre">Por Semestre</option>
+                <option value="horasAsistente">Por Horas Asistente</option>
+                <option value="horasEspecial">Por Horas Especial</option>
+                <option value="horasEstudiante">Por Horas Estudiante</option>
+                <option value="horasTutoria">Por Horas Tutoria</option>
               </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
                 <Form.Control
                   type="search"
-                  placeholder="Buscar..."
+                  placeholder="Buscar"
                   className="me-2"
                   aria-label="Search"
+                  onChange={handleBusqueda}
                 />
-                <Button variant="success">
-                  <MdSearch />
-                </Button>
               </Form>
             </div>
           </div>
@@ -311,8 +399,31 @@ const Periodos = () => {
           >
             Cancelar
           </Button>
-          <Button variant="danger" onClick={handleConfirmClick}>
-            Eliminar
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showModalEditar}
+        onHide={() => setShowModalEditar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar edición</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres editar este periodo?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEditar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmUpdate}>
+            Aceptar
           </Button>
         </Modal.Footer>
       </Modal>
@@ -322,7 +433,7 @@ const Periodos = () => {
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarPeriodo : agregarPeriodo}>
+          <Form id="form1" onSubmit={id ? handleUpdateClick : agregarPeriodo}>
             <Form.Group className="mb-3" controlId="year">
               <Form.Label>Año</Form.Label>
               <Form.Control
