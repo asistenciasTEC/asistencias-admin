@@ -31,6 +31,8 @@ function Cursos() {
   const [show, setShow] = useState(false);
   const [modalAction, setModalAction] = useState("");
   const [cursoEliminar, setCursoEliminar] = useState("");
+  const [busqueda, setBusqueda]= useState("");
+
 
   const { id, nombre, carrera, codigo } = dataForm;
   const handleChange = (e) => {
@@ -167,6 +169,22 @@ function Cursos() {
     setCurrentPage(pageNumber);
   };
 
+  const handleBusqueda=e=>{
+    setBusqueda(e.target.value);
+    filtrar(e.target.value);
+  }
+  
+  const filtrar=(terminoBusqueda)=>{
+    var resultadosBusqueda=Cursos.filter((elemento)=>{
+      if(elemento.nombre.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      || elemento.codigo.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ){
+        return elemento;
+      }
+    });
+    setCursos(resultadosBusqueda);
+  }
+
   return (
     <div className="container-lg ">
       <h1>Cursos</h1>
@@ -192,11 +210,11 @@ function Cursos() {
             </div>
             <div className="col">
               <Form className="d-sm-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Buscar"
-                  className="me-2"
-                  aria-label="Search"
+                <input
+                  className="form-control inputBuscar"
+                  value={busqueda}
+                  placeholder="Búsqueda por Nombre o Codigo"
+                  onChange={handleBusqueda}
                 />
                 <Button variant="outline-success">Buscar</Button>
               </Form>
