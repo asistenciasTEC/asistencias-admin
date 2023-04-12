@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
+import {MdInfo, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
 
 const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -31,13 +31,15 @@ const Gestion = () => {
     notaCursoAsistir: "",
     horario: "",
     boleta: "",
+    condicion: "",
+    horasAsignadas: "",
     fecha: ""
   });
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
-  const [periodoAEliminar, setPeriodoAELiminar] = useState("");
+  const [solicitudAEliminar, setsolicitudAELiminar] = useState("");
 
   const {
     id,
@@ -58,6 +60,8 @@ const Gestion = () => {
     notaCursoAsistir,
     horario,
     boleta,
+    condicion,
+    horasAsignadas,
     fecha
   } = dataForm;
 
@@ -81,72 +85,93 @@ const Gestion = () => {
   }
 
   const handleDeleteClick = (id) => {
-    setPeriodoAELiminar(id);
-    setShowModalEliminar(true);
-  };
-
-  const handleConfirmClick = () => {
-    eliminarPeriodo(periodoAEliminar);
-    setShowModalEliminar(false);
+    console.log (id)
   };
 
   const abrirModal = (accion, id) => {
-    if (accion === "agregar") {
-      setModalTitle("Agregar periodo");
-      setModalAction("Agregar");
+    const solicitud = solicitudes.find((solicitud) => solicitud.id === id);
+      setModalTitle("Informacion de la solicitud");
+      setModalAction("Aprobar");
       setDataForm({
-        id: "",
-        year: "",
-        semestre: "",
-        horasAsistente: "",
-        horasEspecial: "",
-        horasEstudiante: "",
-        horasTutoria: "",
-        fecha: ""
+        id: solicitud.id,
+        tipoAsistencia: solicitud.tipoAsistencia,
+        cedula: solicitud.cedula,
+        carne:  solicitud.carne,
+        apellido1: solicitud.apellido1,
+        apellido2: solicitud.apellido2,
+        nombre: solicitud.nombre,
+        promedioPondSemAnt: solicitud.promedioPondSemAnt,
+        créditosAproSemAnt: solicitud.créditosAproSemAnt,
+        correo: solicitud.correo,
+        telefono: solicitud.telefono,
+        cuentaBancaria: solicitud.cuentaBancaria,
+        cuentaIBAN: solicitud.cuentaIBAN,
+        profesorAsistir: solicitud.profesorAsistir,
+        cursoAsistir: solicitud.cursoAsistir,
+        notaCursoAsistir: solicitud.notaCursoAsistir,
+        horario: solicitud.horario,
+        boleta: solicitud.boleta,
+        condicion: solicitud.condicion,
+        horasAsignadas: solicitud.horasAsignadas,
+        fecha: solicitud.fecha
       });
-
-    } else if (accion === "editar") {
-      const periodo = solicitudes.find((periodo) => periodo.id === id);
-      setModalTitle("Editar periodo");
-      setModalAction("Guardar cambios");
-      setDataForm({
-        id: periodo.id,
-        year: periodo.year,
-        semestre: periodo.semestre,
-        horasAsistente: periodo.horasAsistente,
-        horasEspecial: periodo.horasEspecial,
-        horasEstudiante: periodo.horasEstudiante,
-        horasTutoria: periodo.horasTutoria,
-        fecha: periodo.fecha
-      });
-    }
     setShowModal(true);
   };
 
   const cerrarModal = () => {
+    console.log (id)
     setShowModal(false);
   };
 
-  function buscarPeriodo(year, semestre) {
-    for (let index = 0; index < solicitudes.length; index++) {
-      console.log(solicitudes[index].year, solicitudes[index].semestre)
-    }
 
-    for (let i = 0; i < solicitudes.length; i++) {
-      if (solicitudes[i].year === year && solicitudes[i].semestre === semestre) {
-        return solicitudes[i];
-      }
-      return null;
-    }
-  }
 
-  //CRUD
-  
-  const aceptarSolicitud = async (id) => {
+
+
+
+
+  const aceptarSolicitud = async (e) => {
+    e.preventDefault();
+    const solicitudActualizado = { id,
+      tipoAsistencia,
+      cedula,
+      carne,
+      apellido1,
+      apellido2,
+      nombre,
+      promedioPondSemAnt,
+      créditosAproSemAnt,
+      correo,
+      telefono,
+      cuentaBancaria,
+      cuentaIBAN,
+      profesorAsistir,
+      cursoAsistir,
+      notaCursoAsistir,
+      horario,
+      boleta,
+      condicion,
+      horasAsignadas,
+      fecha };
+    const q = query(collection(db, "solicituds"), where("id", "==", id));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      updateDoc(doc.ref, solicitudActualizado)
+        .then(() => {
+          toast.success("solicitud aceptada exitosamente.");
+        })
+        .catch((error) => {
+          toast.error("Ha ocurrido un error.");
+        });
+    });
+    const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
+      solicitud.id === id ? { id: id, ...solicitudActualizado } : solicitud
+    );
+    setSolicitudes(listaSolicitudesActualizada);
   };
 
   const rechazarSolicitud = async (id) => {
-
+    console.log (id)
   };
 
   //Paginación
@@ -179,10 +204,10 @@ const Gestion = () => {
                 <option value="0" disabled="disabled">Ordenar por:</option>
                 <option value="1">Año</option>
                 <option value="2">Semestre</option>
-                <option value="3">Horas Asistente</option>
-                <option value="4">Horas Especial</option>
-                <option value="5">Horas Estudiante</option>
-                <option value="6">Horas Tutoria</option>
+                <option value="3">Nombre estudiante</option>
+                <option value="4">Curso</option>
+                <option value="5">Profesor</option>
+                <option value="6">Tipo de asistencia</option>
               </Form.Select>
             </div>
             <div className="col">
@@ -205,38 +230,31 @@ const Gestion = () => {
       <Table striped bordered hover>
         <thead className="table-dark table-bg-scale-50">
           <tr>
-            <th>Año</th>
-            <th>Semestre</th>
-            <th>Horas Asistente</th>
-            <th>Horas Especial</th>
-            <th>Horas Estudiante</th>
-            <th>Horas Tutoria</th>
+            <th>Carné</th>
+            <th>Tipo de Asistencia</th>
+            <th>Curso</th>
+            <th>Profesor</th>
+            <th>Condición</th>
+            <th>Horas asignadas</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((periodo) => (
-            <tr key={periodo.id}>
-              <td>{periodo.year}</td>
-              <td>{periodo.semestre}</td>
-              <td>{periodo.horasAsistente}</td>
-              <td>{periodo.horasEspecial}</td>
-              <td>{periodo.horasEstudiante}</td>
-              <td>{periodo.horasTutoria}</td>
+          {currentItems.map((solicitud) => (
+            <tr key={solicitud.id}>
+              <td>{solicitud.carne}</td>
+              <td>{solicitud.tipoAsistencia}</td>
+              <td>{solicitud.cursoAsistir}</td>
+              <td>{solicitud.profesorAsistir}</td>
+              <td>{solicitud.condicion}</td>
+              <td>{solicitud.horasAsignadas}</td>
               <td>
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
-                  variant="warning"
-                  onClick={() => abrirModal("editar", periodo.id)}
+                  variant="info"
+                  onClick={() => abrirModal("editar", solicitud.id)}
                 >
-                  <MdEdit />
-                </Button>
-                <Button
-                  className="px-2 py-1 mx-1 fs-5"
-                  variant="danger"
-                  onClick={() => handleDeleteClick(periodo.id)}
-                >
-                  <MdDelete />
+                  <MdInfo />
                 </Button>
               </td>
             </tr>
@@ -264,105 +282,244 @@ const Gestion = () => {
         />
       </Pagination>
 
-      <Modal
-        show={showModalEliminar}
-        onHide={() => setShowModalEliminar(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmar eliminación</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          ¿Estás seguro de que quieres eliminar este periodo?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowModalEliminar(false)}
-          >
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={handleConfirmClick}>
-            Eliminar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarPeriodo : agregarPeriodo}>
-            <Form.Group className="mb-3" controlId="year">
-              <Form.Label>Año</Form.Label>
+          <Form id="form1" onSubmit={aceptarSolicitud}>
+            <Form.Group className="mb-3" controlId="tipoAsistencia">
+              <Form.Label>Tipo de Asistencia</Form.Label>
               <Form.Control
-                type="number"
-                min={1000}
-                max={9999}
-                placeholder="Escribe el año del periodo"
-                value={year}
+                type="text"
+                value={tipoAsistencia}
                 onChange={handleChange}
                 autoComplete='off'
                 required
+                disabled
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="semestre">
-              <Form.Label>Semestre</Form.Label>
+            <Form.Group className="mb-3" controlId="cedula">
+              <Form.Label>Cedula</Form.Label>
+              <Form.Control
+                type="number"
+                value={cedula}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="carne">
+              <Form.Label>Carné</Form.Label>
+              <Form.Control
+                type="number"
+                value={carne}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="apellido1">
+              <Form.Label>Primer Apellido</Form.Label>
+              <Form.Control
+                type="text"
+                value={apellido1}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="apellido1">
+              <Form.Label>Segundo Apellido</Form.Label>
+              <Form.Control
+                type="text"
+                value={apellido2}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="nombre">
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                value={nombre}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="promedioPondSemAnt">
+              <Form.Label>Promedio Ponderado Semestre Anterior</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="N/A"
+                value={promedioPondSemAnt}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="créditosAproSemAnt">
+              <Form.Label>Creditos Aprobados Semestre Anterior</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="N/A"
+                value={créditosAproSemAnt}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group> 
+
+            <Form.Group className="mb-3" controlId="correo">
+              <Form.Label>Correo</Form.Label>
+              <Form.Control
+                type="text"
+                value={correo}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="telefono">
+              <Form.Label>Telefono</Form.Label>
+              <Form.Control
+                type="number"
+                value={telefono}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="cuentaBancaria">
+              <Form.Label>Cuenta Bancaria</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="N/A"
+                value={cuentaBancaria}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="cuentaIBAN">
+              <Form.Label>Cuenta IBAN</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="N/A"
+                value={cuentaIBAN}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="profesorAsistir">
+              <Form.Label>Profesor a Asistir</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="N/A"
+                value={profesorAsistir}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="cursoAsistir">
+              <Form.Label>Curso a Asistir</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="N/A"
+                value={cursoAsistir}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+            
+            <Form.Group className="mb-3" controlId="notaCursoAsistir">
+              <Form.Label>Nota Curso a Asistir</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="N/A"
+                value={notaCursoAsistir}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="horario">
+              <Form.Label>Horario</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Aqui va a ir el horario"
+                value={horario}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="boleta">
+              <Form.Label>Boleta</Form.Label>
+              <Form.Control
+                type="jpg"
+                placeholder="Aqui va a ir la boleta"
+                value={boleta}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="condicion">
+              <Form.Label>Condicion</Form.Label>
+              <Form.Control
+                type="text"
+                value={condicion}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="horasAsignadas">
+              <Form.Label>Horas Asignadas</Form.Label>
               <Form.Control
                 type="number"
                 min={1}
-                max={2}
-                placeholder="Escribe el semestre del periodo"
-                value={semestre}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="horasAsistente">
-              <Form.Label>Horas Asistente</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Escribe la cantidad de horas asistente"
-                value={horasAsistente}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="horasEspecial">
-              <Form.Label>Horas Especial</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Escribe la cantidad de horas especial"
-                value={horasEspecial}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="horasEstudiante">
-              <Form.Label>Horas Estudiante</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Escribe la cantidad de horas estudiante"
-                value={horasEstudiante}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="horasTutoria">
-              <Form.Label>Horas Tutoría</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Escribe la cantidad de horas tutoria"
-                value={horasTutoria}
+                max={10}
+                value={horasAsignadas}
                 onChange={handleChange}
                 autoComplete='off'
                 required
@@ -372,12 +529,15 @@ const Gestion = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button form="form1" variant="primary" type="submit">
-            {modalAction}
-          </Button>{" "}
           <Button variant="secondary" onClick={cerrarModal}>
-            Cancelar
+          Cancelar
           </Button>{" "}
+          <Button form="form1" variant="danger" type="submit">
+            Rechazar
+          </Button>{" "}
+          <Button form="form1" variant="success" type="submit">
+            Aceptar
+          </Button>
         </Modal.Footer>
       </Modal>
       <ToastContainer />
