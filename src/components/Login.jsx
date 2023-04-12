@@ -23,11 +23,10 @@ const Login = () => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
     if (!email || !password) {
-      setData({ ...data, error: "All fields are required" });
+      setData({ ...data, error: "Todos los campos son obligatorios"});
     }
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-
+      await signInWithEmailAndPassword(auth, email, password);
       setData({
         email: "",
         password: "",

@@ -6,7 +6,7 @@ body {
 
 .NavContainer {
     padding: 1rem;
-    background-color: rgb(20, 20, 151);
+    background-color: #02457c;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -111,11 +111,11 @@ function Cursos() {
 
     if (buscarcurso(codigo) === null || Cursos.length === 0) {
       await addDoc(collection(db, "cursos"), nuevocurso);
-      setCursos([...Cursos, nuevocurso]);
+      setCursos([nuevocurso, ...Cursos]);
       toast.success("Curso agregado exitosamente.");
       cerrarModal();
     } else if (buscarcurso(codigo) !== null ) {
-      console.log(buscarcurso(codigo));
+
       toast.error("El codigo a registrar ya existe");
     }
   };
