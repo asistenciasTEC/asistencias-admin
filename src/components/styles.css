@@ -6,14 +6,15 @@ body {
 
 .NavContainer {
     padding: 1rem;
-    background-color: rgb(20, 20, 151);
+    background-color: #02457c;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
+
 .NavContainer h2{
-    font-weight: 400;
+    font-weight: 200;
     color: white;
 }
 
@@ -29,14 +30,15 @@ body {
     color: white;
 }
 
-
 .btnLogout{
-    border-radius: 50%;
-    background: red;
+    background: none;
     text-align: center;
     border: none;
 }
 
+.btnLogout svg{
+    color: white;
+}
 
 /*   Login */
 

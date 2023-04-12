@@ -14,9 +14,7 @@ import { v4 as uuid } from "uuid";
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 //librería de iconos boostrap para react
-import { FaUserTimes } from "react-icons/fa";
-import { FaUserEdit } from "react-icons/fa";
-import { FaUserPlus } from "react-icons/fa";
+import { MdAddBox, MdEdit, MdDelete} from "react-icons/md";
 
 function Cursos() {
   const [Cursos, setCursos] = useState([].sort());
@@ -31,8 +29,12 @@ function Cursos() {
   const [show, setShow] = useState(false);
   const [modalAction, setModalAction] = useState("");
   const [cursoEliminar, setCursoEliminar] = useState("");
-  const [busqueda, setBusqueda]= useState("");
+  const [resultados, setResultados] = useState([]);
+  const [valorSeleccionado, setValorSeleccionado] = useState("");
 
+
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [cursoAEditar, setCursoAEditar] = useState("");
 
   const { id, nombre, carrera, codigo } = dataForm;
   const handleChange = (e) => {
@@ -90,17 +92,30 @@ function Cursos() {
     }
   }
 
+  //Confirm update
+  const handleUpdateClick = (e) => {
+    e.preventDefault();
+    setCursoAEditar(e);
+    cerrarModal();
+    setShowModalEditar(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    editarcurso(cursoAEditar);
+    setShowModalEditar(false);
+  };
+
   const agregarcurso = async (e) => {
     e.preventDefault();
     const nuevocurso = { id: uuid(), nombre, carrera, codigo };
 
     if (buscarcurso(codigo) === null || Cursos.length === 0) {
       await addDoc(collection(db, "cursos"), nuevocurso);
-      setCursos([...Cursos, nuevocurso]);
+      setCursos([nuevocurso, ...Cursos]);
       toast.success("Curso agregado exitosamente.");
       cerrarModal();
     } else if (buscarcurso(codigo) !== null ) {
-      console.log(buscarcurso(codigo));
+
       toast.error("El codigo a registrar ya existe");
     }
   };
@@ -124,7 +139,6 @@ function Cursos() {
       curso.id === id ? { id: id, ...cursoActualizado } : curso
     );
     setCursos(listaCursosActualizada);
-    cerrarModal();
   };
 
   
@@ -160,29 +174,59 @@ function Cursos() {
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(Cursos.length / itemsPerPage);
+  const totalPages =
+    resultados.length > 0
+      ? Math.ceil(resultados.length / itemsPerPage)
+      : Math.ceil(Cursos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = Cursos.slice(startIndex, endIndex);
+  const currentItems =
+    resultados.length > 0
+      ? resultados.slice(startIndex, endIndex)
+      : Cursos.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleBusqueda=e=>{
-    setBusqueda(e.target.value);
-    filtrar(e.target.value);
-  }
-  
-  const filtrar=(terminoBusqueda)=>{
-    var resultadosBusqueda=Cursos.filter((elemento)=>{
-      if(elemento.nombre.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
-      || elemento.codigo.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
-      ){
-        return elemento;
+  const buscarEnLista = (terminoBusqueda) => {
+    const resultadosBusq = [];
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === "nombre"  ||
+      valorSeleccionado === "" 
+    ) {
+      for (let i = 0; i <  Cursos.length; i++) {
+        if (
+          Cursos[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(Cursos[i]);
+        }
       }
-    });
-    setCursos(resultadosBusqueda);
+    }
+    if (valorSeleccionado === "carrera") {
+      for (let i = 0; i < Cursos.length; i++) {
+        if (Cursos[i].carrera === terminoBusqueda) {
+          resultadosBusq.push(Cursos[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "codigo") {
+      for (let i = 0; i < Cursos.length; i++) {
+        if (Cursos[i].codigo === terminoBusqueda) {
+          resultadosBusq.push(Cursos[i]);
+        }
+      }
+    }
+    setResultados(resultadosBusq);
+  };
+  const handleBusqueda = (event) => {
+    const terminoBusqueda = event.target.value;
+    buscarEnLista(terminoBusqueda);
+  };
+  
+  function handleSelectChange(event) {
+    setValorSeleccionado(event.target.value);
   }
 
   return (
@@ -195,28 +239,29 @@ function Cursos() {
             variant="primary"
             onClick={() => abrirModal("agregar")}
           >
-            <FaUserPlus />
+            <MdAddBox />
           </Button>
         </div>
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select aria-label="Default select example">
-                <option>Filtros</option>
-                <option value="Nombre">Nombre</option>
-                <option value="Carrera">Carrera</option>
-                <option value="Codigo">Codigo</option>
+              <Form.Select aria-label="Default select example"
+                onChange={handleSelectChange}>
+                <option value="default">Filtros</option>
+                <option value="nombre">Por Nombre</option>
+                <option value="carrera">Por Carrera</option>
+                <option value="codigo">Por Codigo</option>
               </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
-                <input
-                  className="form-control inputBuscar"
-                  value={busqueda}
-                  placeholder="Búsqueda por Nombre o Codigo"
+                <Form.Control
+                  type="search"
+                  placeholder="Buscar"
+                  className="me-2"
+                  aria-label="Search"
                   onChange={handleBusqueda}
                 />
-                <Button variant="outline-success">Buscar</Button>
               </Form>
             </div>
           </div>
@@ -244,14 +289,14 @@ function Cursos() {
                   variant="warning"
                   onClick={() => abrirModal("editar", curso.id)}
                 >
-                  <FaUserEdit />
+                  <MdEdit />
                 </Button>
                 <Button
                   className="px-2 py-1 mx-1 fs-5"
                   variant="danger"
                   onClick={() => handleShow(curso.id)}
                 >
-                  <FaUserTimes />
+                  <MdDelete />
                 </Button>
               </td>
             </tr>
@@ -299,13 +344,36 @@ function Cursos() {
                 </Button>
             </Modal.Footer>
         </Modal>
+      
+      <Modal
+        show={showModalEditar}
+        onHide={() => setShowModalEditar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar edición</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres editar este curso?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalEditar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmUpdate}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarcurso : agregarcurso}>
+          <Form id="form1" onSubmit={id ? handleUpdateClick : agregarcurso}>
             <Form.Group className="mb-3" controlId="nombre">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
