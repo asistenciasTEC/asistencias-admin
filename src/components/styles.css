@@ -1,0 +1,133 @@
+body {
+    background-color: white;
+}
+
+/* Navbar    */
+
+.NavContainer {
+    padding: 1rem;
+    background-color: rgb(20, 20, 151);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.NavContainer h2{
+    font-weight: 400;
+    color: white;
+}
+
+.Scroll a{
+    color: rgb(224, 209, 209);
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+
+
+.Scroll a:hover{
+    color: white;
+}
+
+
+.btnLogout{
+    border-radius: 50%;
+    background: red;
+    text-align: center;
+    border: none;
+}
+
+
+/*   Login */
+
+section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+}
+  
+  
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+  
+.input_container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+  
+label {
+    margin-bottom: 5px;
+}
+  
+input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+  
+.btn_container {
+    display: flex;
+    justify-content: center;
+}
+  
+.btnIngresar {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+  
+.btnIngresar:hover {
+    background-color: #0069d9;
+}
+  
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .NavContainer{
+        flex-direction: column;
+
+    }
+}
+
+
+
+/* Inicio */
+
+.pagImagen{
+    text-align: center;
+    display: block;
+    margin: 0;
+}
+
+
+/* Not Found */
+
+.pagNotFound{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pagNotFound h3{
+   color: red;
+   text-align: center;;
+}
+
