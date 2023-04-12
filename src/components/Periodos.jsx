@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdSearch } from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -28,7 +28,6 @@ const Periodos = () => {
   const [modalAction, setModalAction] = useState("");
   const [periodoAEliminar, setPeriodoAELiminar] = useState("");
 
-
   const {
     id,
     year,
@@ -39,25 +38,6 @@ const Periodos = () => {
     horasTutoria,
     fecha
   } = dataForm;
-
-  const handleChange = (e) => {
-    setDataForm({
-      ...dataForm,
-      [e.target.id]: e.target.value
-    })
-  }
-
-
-  const handleDeleteClick = (id) => {
-    setPeriodoAELiminar(id);
-    setShowModalEliminar(true);
-  };
-
-  const handleConfirmClick = () => {
-    // Lógica para eliminar el elemento
-    eliminarPeriodo(periodoAEliminar);
-    setShowModalEliminar(false);
-  };
 
   useEffect(() => {
     const obtenerPeriodos = async () => {
@@ -70,6 +50,23 @@ const Periodos = () => {
     };
     obtenerPeriodos();
   }, []);
+
+  const handleChange = (e) => {
+    setDataForm({
+      ...dataForm,
+      [e.target.id]: e.target.value
+    })
+  }
+
+  const handleDeleteClick = (id) => {
+    setPeriodoAELiminar(id);
+    setShowModalEliminar(true);
+  };
+
+  const handleConfirmClick = () => {
+    eliminarPeriodo(periodoAEliminar);
+    setShowModalEliminar(false);
+  };
 
   const abrirModal = (accion, id) => {
     if (accion === "agregar") {
@@ -113,7 +110,6 @@ const Periodos = () => {
       console.log(periodos[index].year, periodos[index].semestre)
     }
 
-
     for (let i = 0; i < periodos.length; i++) {
       if (periodos[i].year === year && periodos[i].semestre === semestre) {
         return periodos[i];
@@ -122,6 +118,7 @@ const Periodos = () => {
     }
   }
 
+  //CRUD
   const agregarPeriodo = async (e) => {
     e.preventDefault();
     const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha: serverTimestamp() };
@@ -187,6 +184,11 @@ const Periodos = () => {
     setCurrentPage(pageNumber);
   };
 
+  //Busqueda
+
+  //Orden
+
+
   return (
     <div className="container-lg ">
       <h1>Periodos</h1>
@@ -203,22 +205,25 @@ const Periodos = () => {
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select aria-label="Default select example">
-                <option>Filtros</option>
-                <option value="Nombre">Opción 1</option>
-                <option value="opcion2">Opción 2</option>
-                <option value="opcion3">Opción 3</option>
+              <Form.Select defaultValue="0" aria-label="Default select example" >
+                <option value="0" disabled="disabled">Ordenar por:</option>
+                <option value="1">Año</option>
+                <option value="2">Semestre</option>
+                <option value="3">Horas Asistente</option>
+                <option value="4">Horas Especial</option>
+                <option value="5">Horas Estudiante</option>
+                <option value="6">Horas Tutoria</option>
               </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
                 <Form.Control
                   type="search"
-                  placeholder="Search"
+                  placeholder="Buscar..."
                   className="me-2"
                   aria-label="Search"
                 />
-                <Button variant="outline-success">
+                <Button variant="success">
                   <MdSearch />
                 </Button>
               </Form>
@@ -311,7 +316,6 @@ const Periodos = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
