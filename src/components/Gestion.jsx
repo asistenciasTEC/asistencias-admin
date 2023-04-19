@@ -116,9 +116,9 @@ const Gestion = () => {
     setShowModal(false);
   };
 
-  const gestionSolicitud = async (e) => {
+  const aceptarGestion = async (e) => {
     e.preventDefault();
-    if (horasAsignadas !== 0) {
+    if (horasAsignadas !== "0") {
       const solicitudActualizada = {
         id,
         tipoAsistencia,
@@ -148,7 +148,7 @@ const Gestion = () => {
       querySnapshot.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
-            toast.success("solicitud aceptada exitosamente.");
+            toast.success("Solicitud aceptada exitosamente.");
           })
           .catch((error) => {
             toast.error("Ha ocurrido un error.");
@@ -158,6 +158,19 @@ const Gestion = () => {
         solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
       );
       setSolicitudes(listaSolicitudesActualizada);
+      cerrarModal();
+
+    } else {
+      cerrarModal();
+      toast.error("Ha ocurrido un error al aceptar.");
+    }
+  };
+
+  const gestionSolicitud = async (e) => {
+    e.preventDefault();
+    if (horasAsignadas !== "0") {
+      cerrarModal();
+      toast.error("Ha ocurrido un error al rechazar.");
     } else {
       const solicitudActualizada = {
         id,
@@ -198,8 +211,8 @@ const Gestion = () => {
         solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
       );
       setSolicitudes(listaSolicitudesActualizada);
+      cerrarModal();
     }
-    cerrarModal();
   };
 
   //Paginación
@@ -634,10 +647,10 @@ const Gestion = () => {
           <Button variant="secondary" onClick={cerrarModal}>
             Cancelar
           </Button>{" "}
-          <Button form="form1" variant="danger" type="submit">
+          <Button id="botonRechazar" form="form1" variant="danger" type="submit">
             Rechazar
           </Button>{" "}
-          <Button form="form1" variant="success" type="submit">
+          <Button id="botonAceptar" form="form1" variant="success" type="submit" onClick={aceptarGestion}>
             Aceptar
           </Button>
         </Modal.Footer>
