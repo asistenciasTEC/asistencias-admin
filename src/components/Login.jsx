@@ -43,7 +43,7 @@ const Login = () => {
       <h3>Inicio de Sesion</h3>
       <form className="form" onSubmit={handleSubmit}>
         <div className="input_container">
-          <label htmlFor="email">Correo electronico</label>
+          <label htmlFor="email">Correo electrónico</label>
           <input
             type="text"
             name="email"
@@ -60,7 +60,7 @@ const Login = () => {
             onChange={handleChange}
           />
         </div>
-        {error ? <p className="error">{"Los datos son invalidos o los campos se encuentran vacios."}</p> : null}
+        {error ? <p className="error">{"Los datos son inválidos o los campos se encuentran vacíos."}</p> : null}
         <div className="btn_container">
           <button className="btnIngresar" disabled={loading}>
             {loading ? "Ingresando..." : "Ingresar"}

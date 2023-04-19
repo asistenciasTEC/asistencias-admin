@@ -311,7 +311,7 @@ const Periodos = () => {
                 <option value="horasAsistente">Por Horas Asistente</option>
                 <option value="horasEspecial">Por Horas Especial</option>
                 <option value="horasEstudiante">Por Horas Estudiante</option>
-                <option value="horasTutoria">Por Horas Tutoria</option>
+                <option value="horasTutoria">Por Horas Tutoría</option>
               </Form.Select>
             </div>
             <div className="col">
@@ -337,7 +337,7 @@ const Periodos = () => {
             <th>Horas Asistente</th>
             <th>Horas Especial</th>
             <th>Horas Estudiante</th>
-            <th>Horas Tutoria</th>
+            <th>Horas Tutoría</th>
             <th>Acciones</th>
           </tr>
         </thead>

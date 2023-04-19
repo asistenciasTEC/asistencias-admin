@@ -112,12 +112,19 @@ input {
 
 /* Inicio */
 
-.pagImagen{
+.pagImagen img{
+    text-align: center;
+    width: 50%; /* reduce el ancho de la imagen al 50% */
+    height: auto; /* ajusta automáticamente la altura para mantener la relación de aspecto */
+    display: block;
+    margin: 0 auto;
+}
+
+.pagText{
     text-align: center;
     display: block;
     margin: 0;
 }
-
 
 /* Not Found */
 
