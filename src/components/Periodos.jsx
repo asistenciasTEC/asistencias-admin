@@ -140,7 +140,16 @@ const Periodos = () => {
   //CRUD
   const agregarPeriodo = async (e) => {
     e.preventDefault();
-    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha: serverTimestamp() };
+    const nuevoPeriodo = {
+      id: uuid(),
+      year,
+      semestre,
+      horasAsistente,
+      horasEspecial,
+      horasEstudiante,
+      horasTutoria,
+      fecha: serverTimestamp()
+    };
 
     if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
       await addDoc(collection(db, "periodos"), nuevoPeriodo);
@@ -466,6 +475,8 @@ const Periodos = () => {
               <Form.Label>Horas Asistente</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas asistente"
                 value={horasAsistente}
                 onChange={handleChange}
@@ -478,6 +489,8 @@ const Periodos = () => {
               <Form.Label>Horas Especial</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas especial"
                 value={horasEspecial}
                 onChange={handleChange}
@@ -490,6 +503,8 @@ const Periodos = () => {
               <Form.Label>Horas Estudiante</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas estudiante"
                 value={horasEstudiante}
                 onChange={handleChange}
@@ -502,6 +517,8 @@ const Periodos = () => {
               <Form.Label>Horas Tutoría</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas tutoria"
                 value={horasTutoria}
                 onChange={handleChange}
