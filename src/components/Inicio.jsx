@@ -6,8 +6,9 @@ const Inicio = () => {
     <>
     <div className='pagImagen'>
         <img src={imagen} alt="Logo2" />
-        <h4>Te damos la bienvenida al Sistema de Gestion de Asistencias del Tecnologico de Costa Rica</h4>
-        
+    </div>
+    <div className='pagText'>
+        <h4>Te damos la bienvenida al Sistema de Gestión de Asistencias del Tecnológico de Costa Rica</h4>
     </div>
     </>
   )

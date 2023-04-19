@@ -224,8 +224,8 @@ function Profesores() {
                 onChange={handleSelectChange}
               >
                 <option value="default">Filtros</option>
-                <option value="nombre">Por nombre</option>
-                <option value="correo">Por correo</option>
+                <option value="nombre">Por Nombre</option>
+                <option value="correo">Por Correo</option>
               </Form.Select>
             </div>
             <div className="col">
@@ -247,7 +247,7 @@ function Profesores() {
         <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Nombre completo</th>
-            <th>E-mail</th>
+            <th>Correo Electrónico</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -339,10 +339,10 @@ function Profesores() {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="email">
-              <Form.Label>E-mail</Form.Label>
+              <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Escribe el e-mail del profesor"
+                placeholder="Escribe el correo electrónico del profesor"
                 value={email}
                 onChange={handleChange}
                 autoComplete="off"

@@ -16,7 +16,7 @@ function Header() {
     return (
         <header className='App-header'>
             <div className='NavContainer'>
-                <h2>Sistema de Gestion de Asistencias</h2>
+                <h2>Sistema de Gestión de Asistencias</h2>
                     <div className='Scroll'>
                         {user ? (
                         <>
