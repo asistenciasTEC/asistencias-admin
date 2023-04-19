@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, serverTimestamp, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
-import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
+import { collection, query, where, getDocs, updateDoc, orderBy } from "firebase/firestore";
+import { Table, Modal, Form, Button, Pagination, Row, Col } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
-import { v4 as uuid } from 'uuid';
 
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import {MdInfo, MdSearch, IoMdArrowRoundDown, IoMdArrowRoundUp } from "react-icons/md";
+import {MdInfo} from "react-icons/md";
 
 const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -38,6 +37,8 @@ const Gestion = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [resultados, setResultados] = useState([]);
+  const [valorSeleccionado, setValorSeleccionado] = useState("");
 
   const {
     id,
@@ -63,6 +64,13 @@ const Gestion = () => {
     fecha
   } = dataForm;
 
+  const handleChange = (e) => {
+    setDataForm({
+      ...dataForm,
+      [e.target.id]: e.target.value
+    })
+  }
+
   useEffect(() => {
     const obtenerSolicitudes = async () => {
       const querySolicitudesCollection = query(collection(db, "solicitudes"), orderBy("fecha", "desc"));
@@ -74,13 +82,6 @@ const Gestion = () => {
     };
     obtenerSolicitudes();
   }, []);
-
-  const handleChange = (e) => {
-    setDataForm({
-      ...dataForm,
-      [e.target.id]: e.target.value
-    })
-  }
 
   const abrirModal = (id) => {
     const solicitud = solicitudes.find((solicitud) => solicitud.id === id);
@@ -117,9 +118,7 @@ const Gestion = () => {
 
   const gestionSolicitud = async (e) => {
     e.preventDefault();
-    console.log("Hola")
-    console.log(cedula)
-    if (horasAsignadas !== 0) {
+    if (horasAsignadas != 0) {
       const solicitudActualizada = { id,
         tipoAsistencia,
         cedula,
@@ -202,50 +201,116 @@ const Gestion = () => {
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(solicitudes.length / itemsPerPage);
+  const totalPages =
+    resultados.length > 0
+      ? Math.ceil(resultados.length / itemsPerPage)
+      : Math.ceil(solicitudes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = solicitudes.slice(startIndex, endIndex);
+  const currentItems =
+    resultados.length > 0
+      ? resultados.slice(startIndex, endIndex)
+      : solicitudes.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
   //Busqueda
+  const buscarEnLista = (terminoBusqueda) => {
+    const resultadosBusq = [];
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === "carne"  ||
+      valorSeleccionado === "" 
+    ) {
+      for (let i = 0; i <  solicitudes.length; i++) {
+        if (
+          solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "tipoAsistencia") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "cursoAsistir") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "profesorAsistir") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "condicion") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "horasAsignadas") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].horasAsignadas.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    setResultados(resultadosBusq);
+  };
+  const handleBusqueda = (event) => {
+    const terminoBusqueda = event.target.value;
+    buscarEnLista(terminoBusqueda);
+  };
+  
+  function handleSelectChange(event) {
+    setValorSeleccionado(event.target.value);
+  }
 
   //Orden
-
-
   return (
     <div className="container-lg ">
-      <h1>Gestion
-      
-      </h1>
+      <h1>Gestion</h1>
       <div className="row">
         <div className="col">
           <div className="row">
             <div className="col">
-              <Form.Select defaultValue="0" aria-label="Default select example" >
-                <option value="0" disabled="disabled">Ordenar por:</option>
-                <option value="1">Año</option>
-                <option value="2">Semestre</option>
-                <option value="3">Nombre estudiante</option>
-                <option value="4">Curso</option>
-                <option value="5">Profesor</option>
-                <option value="6">Tipo de asistencia</option>
+              <Form.Select aria-label="Default select example"
+                onChange={handleSelectChange}>
+                <option value="default">Filtros</option>
+                <option value="carne">Por carne</option>
+                <option value="tipoAsistencia">Por tipo de asistencia</option>
+                <option value="cursoAsistir">Por curso a asistir</option>
+                <option value="profesorAsistir">Por profesor a asistir</option>
+                <option value="condicion">Por Condición</option>
+                <option value="horasAsignadas">Por horas asignadas</option>
               </Form.Select>
             </div>
             <div className="col">
               <Form className="d-sm-flex">
                 <Form.Control
                   type="search"
-                  placeholder="Buscar..."
+                  placeholder="Buscar"
                   className="me-2"
                   aria-label="Search"
+                  onChange={handleBusqueda}
                 />
-                <Button variant="success">
-                  <MdSearch />
-                </Button>
               </Form>
             </div>
           </div>
@@ -307,236 +372,244 @@ const Gestion = () => {
         />
       </Pagination>
 
-      <Modal show={showModal} onHide={cerrarModal}>
+      <Modal show={showModal} onHide={cerrarModal} className="modal-xl">
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form id="form1" onSubmit={gestionSolicitud}>
-            <Form.Group className="mb-3" controlId="tipoAsistencia">
-              <Form.Label>Tipo de Asistencia</Form.Label>
-              <Form.Control
-                type="text"
-                value={tipoAsistencia}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+            <Row>
+              <Col>
+              <Form.Group className="mb-3" controlId="apellido1">
+                  <Form.Label>Primer Apellido</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={apellido1}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="cedula">
-              <Form.Label>Cedula</Form.Label>
-              <Form.Control
-                type="number"
-                value={cedula}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="carne">
+                  <Form.Label>Carné</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={carne}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="carne">
-              <Form.Label>Carné</Form.Label>
-              <Form.Control
-                type="number"
-                value={carne}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="cuentaBancaria">
+                  <Form.Label>Cuenta Bancaria</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="N/A"
+                    value={cuentaBancaria}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="apellido1">
-              <Form.Label>Primer Apellido</Form.Label>
-              <Form.Control
-                type="text"
-                value={apellido1}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="tipoAsistencia">
+                  <Form.Label>Tipo de Asistencia</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={tipoAsistencia}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="apellido1">
-              <Form.Label>Segundo Apellido</Form.Label>
-              <Form.Control
-                type="text"
-                value={apellido2}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="promedioPondSemAnt">
+                  <Form.Label>Promedio Ponderado Semestre Anterior</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="N/A"
+                    value={promedioPondSemAnt}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="nombre">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control
-                type="text"
-                value={nombre}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="horario">
+                  <Form.Label>Horario</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Aqui va a ir el horario"
+                    value={horario}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
+              </Col>
 
-            <Form.Group className="mb-3" controlId="promedioPondSemAnt">
-              <Form.Label>Promedio Ponderado Semestre Anterior</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="N/A"
-                value={promedioPondSemAnt}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+              <Col>
+                <Form.Group className="mb-3" controlId="apellido2">
+                  <Form.Label>Segundo Apellido</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={apellido2}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="créditosAproSemAnt">
-              <Form.Label>Creditos Aprobados Semestre Anterior</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="N/A"
-                value={créditosAproSemAnt}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group> 
+                <Form.Group className="mb-3" controlId="cedula">
+                  <Form.Label>Cedula</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={cedula}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="correo">
-              <Form.Label>Correo</Form.Label>
-              <Form.Control
-                type="text"
-                value={correo}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="cuentaIBAN">
+                  <Form.Label>Cuenta IBAN</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="N/A"
+                    value={cuentaIBAN}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="telefono">
-              <Form.Label>Telefono</Form.Label>
-              <Form.Control
-                type="number"
-                value={telefono}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="profesorAsistir">
+                  <Form.Label>Profesor a Asistir</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="N/A"
+                    value={profesorAsistir}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
+                
+                <Form.Group className="mb-3" controlId="créditosAproSemAnt">
+                  <Form.Label>Creditos Aprobados Semestre Anterior</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="N/A"
+                    value={créditosAproSemAnt}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="cuentaBancaria">
-              <Form.Label>Cuenta Bancaria</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="N/A"
-                value={cuentaBancaria}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="boleta">
+                  <Form.Label>Boleta</Form.Label>
+                  <Form.Control
+                    type="jpg"
+                    placeholder="Aqui va a ir la boleta"
+                    value={boleta}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
+              </Col>
 
-            <Form.Group className="mb-3" controlId="cuentaIBAN">
-              <Form.Label>Cuenta IBAN</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="N/A"
-                value={cuentaIBAN}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+              <Col>
+                <Form.Group className="mb-3" controlId="nombre">
+                  <Form.Label>Nombre</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={nombre}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="profesorAsistir">
-              <Form.Label>Profesor a Asistir</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="N/A"
-                value={profesorAsistir}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="correo">
+                  <Form.Label>Correo</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={correo}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="cursoAsistir">
-              <Form.Label>Curso a Asistir</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="N/A"
-                value={cursoAsistir}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3" controlId="notaCursoAsistir">
-              <Form.Label>Nota Curso a Asistir</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="N/A"
-                value={notaCursoAsistir}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="telefono">
+                  <Form.Label>Telefono</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={telefono}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="horario">
-              <Form.Label>Horario</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Aqui va a ir el horario"
-                value={horario}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="cursoAsistir">
+                  <Form.Label>Curso a Asistir</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="N/A"
+                    value={cursoAsistir}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="boleta">
-              <Form.Label>Boleta</Form.Label>
-              <Form.Control
-                type="jpg"
-                placeholder="Aqui va a ir la boleta"
-                value={boleta}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="notaCursoAsistir">
+                  <Form.Label>Nota Curso a Asistir</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="N/A"
+                    value={notaCursoAsistir}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group> 
 
-            <Form.Group className="mb-3" controlId="condicion">
-              <Form.Label>Condicion</Form.Label>
-              <Form.Control
-                type="text"
-                value={condicion}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="condicion">
+                  <Form.Label>Condicion</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={condicion}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
+              </Col>  
+            </Row>
 
             <Form.Group className="mb-3" controlId="horasAsignadas">
               <Form.Label>Horas Asignadas</Form.Label>
