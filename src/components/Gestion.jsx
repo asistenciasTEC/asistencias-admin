@@ -7,7 +7,7 @@ import { db } from "../config/firebase/firebase";
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import {MdInfo} from "react-icons/md";
+import { MdInfo } from "react-icons/md";
 
 const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -85,30 +85,30 @@ const Gestion = () => {
 
   const abrirModal = (id) => {
     const solicitud = solicitudes.find((solicitud) => solicitud.id === id);
-      setModalTitle("Informacion de la solicitud");
-      setDataForm({
-        id: solicitud.id,
-        tipoAsistencia: solicitud.tipoAsistencia,
-        cedula: solicitud.cedula,
-        carne:  solicitud.carne,
-        apellido1: solicitud.apellido1,
-        apellido2: solicitud.apellido2,
-        nombre: solicitud.nombre,
-        promedioPondSemAnt: solicitud.promedioPondSemAnt,
-        créditosAproSemAnt: solicitud.créditosAproSemAnt,
-        correo: solicitud.correo,
-        telefono: solicitud.telefono,
-        cuentaBancaria: solicitud.cuentaBancaria,
-        cuentaIBAN: solicitud.cuentaIBAN,
-        profesorAsistir: solicitud.profesorAsistir,
-        cursoAsistir: solicitud.cursoAsistir,
-        notaCursoAsistir: solicitud.notaCursoAsistir,
-        horario: solicitud.horario,
-        boleta: solicitud.boleta,
-        condicion: solicitud.condicion,
-        horasAsignadas: solicitud.horasAsignadas,
-        fecha: solicitud.fecha
-      });
+    setModalTitle("Informacion de la solicitud");
+    setDataForm({
+      id: solicitud.id,
+      tipoAsistencia: solicitud.tipoAsistencia,
+      cedula: solicitud.cedula,
+      carne: solicitud.carne,
+      apellido1: solicitud.apellido1,
+      apellido2: solicitud.apellido2,
+      nombre: solicitud.nombre,
+      promedioPondSemAnt: solicitud.promedioPondSemAnt,
+      créditosAproSemAnt: solicitud.créditosAproSemAnt,
+      correo: solicitud.correo,
+      telefono: solicitud.telefono,
+      cuentaBancaria: solicitud.cuentaBancaria,
+      cuentaIBAN: solicitud.cuentaIBAN,
+      profesorAsistir: solicitud.profesorAsistir,
+      cursoAsistir: solicitud.cursoAsistir,
+      notaCursoAsistir: solicitud.notaCursoAsistir,
+      horario: solicitud.horario,
+      boleta: solicitud.boleta,
+      condicion: solicitud.condicion,
+      horasAsignadas: solicitud.horasAsignadas,
+      fecha: solicitud.fecha
+    });
     setShowModal(true);
   };
 
@@ -118,8 +118,9 @@ const Gestion = () => {
 
   const gestionSolicitud = async (e) => {
     e.preventDefault();
-    if (horasAsignadas != 0) {
-      const solicitudActualizada = { id,
+    if (horasAsignadas !== 0) {
+      const solicitudActualizada = {
+        id,
         tipoAsistencia,
         cedula,
         carne,
@@ -139,10 +140,11 @@ const Gestion = () => {
         boleta,
         condicion: "Aceptado",
         horasAsignadas,
-        fecha };
+        fecha
+      };
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
-  
+
       querySnapshot.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
@@ -157,7 +159,8 @@ const Gestion = () => {
       );
       setSolicitudes(listaSolicitudesActualizada);
     } else {
-      const solicitudActualizada = { id,
+      const solicitudActualizada = {
+        id,
         tipoAsistencia,
         cedula,
         carne,
@@ -177,10 +180,11 @@ const Gestion = () => {
         boleta,
         condicion: "Rechazado",
         horasAsignadas,
-        fecha };
+        fecha
+      };
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
-  
+
       querySnapshot.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
@@ -221,10 +225,10 @@ const Gestion = () => {
     const resultadosBusq = [];
     if (
       valorSeleccionado === "default" ||
-      valorSeleccionado === "carne"  ||
-      valorSeleccionado === "" 
+      valorSeleccionado === "carne" ||
+      valorSeleccionado === ""
     ) {
-      for (let i = 0; i <  solicitudes.length; i++) {
+      for (let i = 0; i < solicitudes.length; i++) {
         if (
           solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
@@ -278,7 +282,7 @@ const Gestion = () => {
     const terminoBusqueda = event.target.value;
     buscarEnLista(terminoBusqueda);
   };
-  
+
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }
@@ -380,7 +384,7 @@ const Gestion = () => {
           <Form id="form1" onSubmit={gestionSolicitud}>
             <Row>
               <Col>
-              <Form.Group className="mb-3" controlId="apellido1">
+                <Form.Group className="mb-3" controlId="apellido1">
                   <Form.Label>Primer Apellido</Form.Label>
                   <Form.Control
                     type="text"
@@ -506,7 +510,7 @@ const Gestion = () => {
                     disabled
                   />
                 </Form.Group>
-                
+
                 <Form.Group className="mb-3" controlId="créditosAproSemAnt">
                   <Form.Label>Creditos Aprobados Semestre Anterior</Form.Label>
                   <Form.Control
@@ -595,7 +599,7 @@ const Gestion = () => {
                     required
                     disabled
                   />
-                </Form.Group> 
+                </Form.Group>
 
                 <Form.Group className="mb-3" controlId="condicion">
                   <Form.Label>Condicion</Form.Label>
@@ -608,7 +612,7 @@ const Gestion = () => {
                     disabled
                   />
                 </Form.Group>
-              </Col>  
+              </Col>
             </Row>
 
             <Form.Group className="mb-3" controlId="horasAsignadas">
@@ -628,7 +632,7 @@ const Gestion = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={cerrarModal}>
-          Cancelar
+            Cancelar
           </Button>{" "}
           <Button form="form1" variant="danger" type="submit">
             Rechazar
