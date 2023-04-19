@@ -140,7 +140,16 @@ const Periodos = () => {
   //CRUD
   const agregarPeriodo = async (e) => {
     e.preventDefault();
-    const nuevoPeriodo = { id: uuid(), year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha: serverTimestamp() };
+    const nuevoPeriodo = {
+      id: uuid(),
+      year,
+      semestre,
+      horasAsistente,
+      horasEspecial,
+      horasEstudiante,
+      horasTutoria,
+      fecha: serverTimestamp()
+    };
 
     if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
       await addDoc(collection(db, "periodos"), nuevoPeriodo);
