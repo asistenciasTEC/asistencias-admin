@@ -250,7 +250,7 @@ function Cursos() {
                 <option value="default">Filtros</option>
                 <option value="nombre">Por Nombre</option>
                 <option value="carrera">Por Carrera</option>
-                <option value="codigo">Por Codigo</option>
+                <option value="codigo">Por Código</option>
               </Form.Select>
             </div>
             <div className="col">
@@ -273,7 +273,7 @@ function Cursos() {
           <tr>
             <th>Nombre</th>
             <th>Carrera</th>
-            <th>Codigo</th>
+            <th>Código</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -333,7 +333,7 @@ function Cursos() {
                 <Modal.Title>Eliminar elemento</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                ¿Estas seguro de que quieres eliminar este elemento?
+              ¿Estás seguro de que quieres eliminar este elemento?
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShow(false)}>
@@ -402,7 +402,7 @@ function Cursos() {
               <Form.Label>Codigo</Form.Label>
               <Form.Control
                 type="codigo"
-                placeholder="Escribe el codigo del curso"
+                placeholder="Escribe el código del curso"
                 value={codigo}
                 onChange={handleChange}
                 required={!id}

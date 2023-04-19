@@ -4,7 +4,7 @@ const NotFound = () => {
     return (
         <div className='pagNotFound'>
             <h3>Error 404</h3>
-            <h4>Verifica la dirrecion a la que deseas ingresar</h4>
+            <h4>Verifica la direción a la que deseas ingresar</h4>
         </div>
     )
 }
