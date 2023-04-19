@@ -26,10 +26,12 @@ function Profesores() {
     password: "",
   });
   const [showModalEliminar, setShowModalEliminar] = useState(false);
+  const [showModalModificar,setShowModalModificar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
   const [profesorAEliminar, setProfesorAELiminar] = useState("");
+  const [profesorAModificar, setProfesorAModificar] = useState("");
   const [resultados, setResultados] = useState([]);
   const [valorSeleccionado, setValorSeleccionado] = useState("");
   const { id, nombre, email, password } = dataForm;
@@ -40,6 +42,17 @@ function Profesores() {
     });
   };
 
+  const handleModifyClick = (e) => {
+    e.preventDefault();
+    setProfesorAModificar(e);
+    cerrarModal();
+    setShowModalModificar(true);
+  }
+
+  const handleConfirmModify =  () => {
+    editarProfesor(profesorAModificar);
+    setShowModalModificar(true);
+  };
   const handleDeleteClick = (id) => {
     setProfesorAELiminar(id);
     setShowModalEliminar(true);
@@ -89,6 +102,7 @@ function Profesores() {
 
   const cerrarModal = () => {
     setShowModal(false);
+    setShowModalModificar(false);
   };
   function buscarProfesor(email) {
     // console.log(email)
@@ -319,13 +333,36 @@ function Profesores() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <Modal
+        show={showModalModificar}
+        onHide={() => setShowModalModificar(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar modificación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres modificar este profesor?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalModificar(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmModify}>
+            Modificar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
 
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={id ? editarProfesor : agregarProfesor}>
+          <Form id="form1" onSubmit={id ? handleModifyClick : agregarProfesor}>
             <Form.Group className="mb-3" controlId="nombre">
               <Form.Label>Nombre completo</Form.Label>
               <Form.Control
