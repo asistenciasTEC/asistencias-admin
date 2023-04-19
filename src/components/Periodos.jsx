@@ -475,6 +475,8 @@ const Periodos = () => {
               <Form.Label>Horas Asistente</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas asistente"
                 value={horasAsistente}
                 onChange={handleChange}
@@ -487,6 +489,8 @@ const Periodos = () => {
               <Form.Label>Horas Especial</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas especial"
                 value={horasEspecial}
                 onChange={handleChange}
@@ -499,6 +503,8 @@ const Periodos = () => {
               <Form.Label>Horas Estudiante</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas estudiante"
                 value={horasEstudiante}
                 onChange={handleChange}
@@ -511,6 +517,8 @@ const Periodos = () => {
               <Form.Label>Horas Tutoría</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={99999}
                 placeholder="Escribe la cantidad de horas tutoria"
                 value={horasTutoria}
                 onChange={handleChange}
