@@ -14,7 +14,7 @@ import { v4 as uuid } from "uuid";
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete} from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete } from "react-icons/md";
 
 function Cursos() {
   const [Cursos, setCursos] = useState([].sort());
@@ -114,7 +114,7 @@ function Cursos() {
       setCursos([nuevocurso, ...Cursos]);
       toast.success("Curso agregado exitosamente.");
       cerrarModal();
-    } else if (buscarcurso(codigo) !== null ) {
+    } else if (buscarcurso(codigo) !== null) {
 
       toast.error("El codigo a registrar ya existe");
     }
@@ -141,7 +141,7 @@ function Cursos() {
     setCursos(listaCursosActualizada);
   };
 
-  
+
   const handleShow = (id) => {
     setCursoEliminar(id);
     setShow(true);
@@ -193,13 +193,21 @@ function Cursos() {
     const resultadosBusq = [];
     if (
       valorSeleccionado === "default" ||
-      valorSeleccionado === "nombre"  ||
-      valorSeleccionado === "" 
+      valorSeleccionado === ""
     ) {
-      for (let i = 0; i <  Cursos.length; i++) {
+      for (let i = 0; i < Cursos.length; i++) {
         if (
-          Cursos[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase()
+          Cursos[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          Cursos[i].carrera.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          Cursos[i].codigo.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
+          resultadosBusq.push(Cursos[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "nombre") {
+      for (let i = 0; i < Cursos.length; i++) {
+        if (Cursos[i].nombre === terminoBusqueda) {
           resultadosBusq.push(Cursos[i]);
         }
       }
@@ -220,11 +228,12 @@ function Cursos() {
     }
     setResultados(resultadosBusq);
   };
+
   const handleBusqueda = (event) => {
     const terminoBusqueda = event.target.value;
     buscarEnLista(terminoBusqueda);
   };
-  
+
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }
@@ -254,15 +263,13 @@ function Cursos() {
               </Form.Select>
             </div>
             <div className="col">
-              <Form className="d-sm-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Buscar"
-                  className="me-2"
-                  aria-label="Search"
-                  onChange={handleBusqueda}
-                />
-              </Form>
+              <Form.Control
+                type="search"
+                placeholder="Buscar"
+                className="me-2"
+                aria-label="Search"
+                onChange={handleBusqueda}
+              />
             </div>
           </div>
         </div>
@@ -302,11 +309,11 @@ function Cursos() {
             </tr>
           ))}
         </tbody>
-        
+
 
       </Table>
 
-      
+
 
       <Pagination className="justify-content-center">
         <Pagination.Prev
@@ -329,22 +336,22 @@ function Cursos() {
       </Pagination>
 
       <Modal show={show} onHide={() => setShow(false)}>
-            <Modal.Header closeButton>
-                <Modal.Title>Eliminar elemento</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              ¿Estás seguro de que quieres eliminar este elemento?
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShow(false)}>
-                    Cancelar
-                </Button>
-                <Button variant="danger" onClick={handleConfirmar}>
-                    Eliminar
-                </Button>
-            </Modal.Footer>
-        </Modal>
-      
+        <Modal.Header closeButton>
+          <Modal.Title>Eliminar elemento</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que quieres eliminar este elemento?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShow(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleConfirmar}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <Modal
         show={showModalEditar}
         onHide={() => setShowModalEditar(false)}

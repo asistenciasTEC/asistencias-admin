@@ -104,7 +104,6 @@ input {
 @media (max-width: 768px) {
     .NavContainer{
         flex-direction: column;
-
     }
 }
 
@@ -112,10 +111,18 @@ input {
 
 /* Inicio */
 
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+}
+
 .pagImagen img{
     text-align: center;
-    width: 50%; /* reduce el ancho de la imagen al 50% */
-    height: auto; /* ajusta automáticamente la altura para mantener la relación de aspecto */
+    width: 50%;
+    height: auto;
     display: block;
     margin: 0 auto;
 }
@@ -125,6 +132,8 @@ input {
     display: block;
     margin: 0;
 }
+  
+
 
 /* Not Found */
 

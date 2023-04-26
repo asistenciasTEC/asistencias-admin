@@ -26,7 +26,7 @@ function Header() {
                         <Link to="/asistencias">Asistencias</Link>
                         <Link to="/periodos">Periodos</Link>
                         <Link to="/gestion">Gestión</Link>
-                        <button className='btnLogout' onClick={handleSignout}>
+                        <button type="button" className='btnLogout' onClick={handleSignout}>
                             <MdLogout/>
                         </button>
                         </>

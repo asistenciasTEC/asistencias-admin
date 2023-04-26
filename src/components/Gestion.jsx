@@ -31,7 +31,7 @@ const Gestion = () => {
     horario: "",
     boleta: "",
     condicion: "",
-    horasAsignadas: 0,
+    horasAsignadas: "",
     fecha: ""
   });
 
@@ -238,12 +238,40 @@ const Gestion = () => {
     const resultadosBusq = [];
     if (
       valorSeleccionado === "default" ||
-      valorSeleccionado === "carne" ||
       valorSeleccionado === ""
     ) {
       for (let i = 0; i < solicitudes.length; i++) {
         if (
-          solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
+          solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido1.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido2.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          (solicitudes[i].nombre + ' ' + solicitudes[i].apellido1 + ' ' + solicitudes[i].apellido2).toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "carne") {
+      for (let i = 0; i < solicitudes.length; i++) {
+        if (solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
+        ) {
+          resultadosBusq.push(solicitudes[i]);
+        }
+      }
+    }
+    if (valorSeleccionado === "nombre") {
+      for (let i = 0; i < solicitudes.length; i++) {
+
+        if (
+          solicitudes[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido1.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido2.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          (solicitudes[i].nombre + ' ' + solicitudes[i].apellido1 + ' ' + solicitudes[i].apellido2).toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -303,34 +331,29 @@ const Gestion = () => {
   //Orden
   return (
     <div className="container-lg ">
-      <h1>Gestion</h1>
-      <div className="row">
-        <div className="col">
-          <div className="row">
-            <div className="col">
-              <Form.Select aria-label="Default select example"
-                onChange={handleSelectChange}>
-                <option value="default">Filtros</option>
-                <option value="carne">Por carne</option>
-                <option value="tipoAsistencia">Por tipo de asistencia</option>
-                <option value="cursoAsistir">Por curso a asistir</option>
-                <option value="profesorAsistir">Por profesor a asistir</option>
-                <option value="condicion">Por Condición</option>
-                <option value="horasAsignadas">Por horas asignadas</option>
-              </Form.Select>
-            </div>
-            <div className="col">
-              <Form className="d-sm-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Buscar"
-                  className="me-2"
-                  aria-label="Search"
-                  onChange={handleBusqueda}
-                />
-              </Form>
-            </div>
-          </div>
+      <h1>Gestión</h1>
+      <div className="row mb-2 justify-content-end">
+        <div className="col-3">
+          <Form.Select aria-label="Default select example"
+            onChange={handleSelectChange}>
+            <option value="default">Filtros</option>
+            <option value="carne">Por Carné</option>
+            <option value="nombre">Por Nombre</option>
+            <option value="tipoAsistencia">Por Tipo de asistencia</option>
+            <option value="cursoAsistir">Por Curso a asistir</option>
+            <option value="profesorAsistir">Por Profesor a asistir</option>
+            <option value="condicion">Por Condición</option>
+            <option value="horasAsignadas">Por Horas asignadas</option>
+          </Form.Select>
+        </div>
+        <div className="col-3">
+          <Form.Control
+            type="search"
+            placeholder="Buscar"
+            className="me-2"
+            aria-label="Search"
+            onChange={handleBusqueda}
+          />
         </div>
       </div>
 
@@ -338,6 +361,7 @@ const Gestion = () => {
         <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Carné</th>
+            <th>Nombre</th>
             <th>Tipo de Asistencia</th>
             <th>Curso</th>
             <th>Profesor</th>
@@ -350,6 +374,7 @@ const Gestion = () => {
           {currentItems.map((solicitud) => (
             <tr key={solicitud.id}>
               <td>{solicitud.carne}</td>
+              <td>{solicitud.nombre} {solicitud.apellido1} {solicitud.apellido2}</td>
               <td>{solicitud.tipoAsistencia}</td>
               <td>{solicitud.cursoAsistir}</td>
               <td>{solicitud.profesorAsistir}</td>

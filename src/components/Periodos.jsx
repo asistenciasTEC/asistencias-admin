@@ -291,7 +291,7 @@ const Periodos = () => {
       <div className="row">
         <div className="col">
           <Button
-            className=" m-1 align-content-center fs-4"
+            className="px-2 py-1 mb-2 fs-5"
             variant="primary"
             onClick={() => abrirModal("agregar")}
           >
@@ -315,15 +315,13 @@ const Periodos = () => {
               </Form.Select>
             </div>
             <div className="col">
-              <Form className="d-sm-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Buscar"
-                  className="me-2"
-                  aria-label="Search"
-                  onChange={handleBusqueda}
-                />
-              </Form>
+              <Form.Control
+                type="search"
+                placeholder="Buscar"
+                className="me-2"
+                aria-label="Search"
+                onChange={handleBusqueda}
+              />
             </div>
           </div>
         </div>
