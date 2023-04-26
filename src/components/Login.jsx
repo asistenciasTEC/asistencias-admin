@@ -16,6 +16,7 @@ const Login = () => {
   const { email, password, error, loading } = data;
 
   const handleChange = (e) => {
+    e.preventDefault();
     setData({ ...data, [e.target.name]: e.target.value });
   };
 

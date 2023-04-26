@@ -243,15 +243,13 @@ function Profesores() {
               </Form.Select>
             </div>
             <div className="col">
-              <Form className="d-sm-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Buscar"
-                  className="me-2"
-                  aria-label="Search"
-                  onChange={handleBusqueda}
-                />
-              </Form>
+              <Form.Control
+                type="search"
+                placeholder="Buscar"
+                className="me-2"
+                aria-label="Search"
+                onChange={handleBusqueda}
+              />
             </div>
           </div>
         </div>
