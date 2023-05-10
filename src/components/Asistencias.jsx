@@ -8,14 +8,12 @@ import {
 } from "firebase/firestore";
 import { Table, Modal, Form, Button } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
-import ReactHTMLTableToExcel from "react-html-table-to-excel";
 
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
 import { MdEdit } from "react-icons/md";
-import {AiOutlineDownload} from "react-icons/ai"
 function Asistencias() {
   const [asistencias, setAsistencias] = useState([].sort());
   const [dataForm, setDataForm] = useState({
@@ -106,21 +104,10 @@ function Asistencias() {
 
   return (
     <div className="container-lg ">
-      <div className="containerToTitleAndExportToExcel">
-        <h1>Asistencias</h1>
-        <div align="center">
-          <ReactHTMLTableToExcel
-            id="botonExportarExcel"
-            className="btn btn-success"
-            table="infoAsistencias"
-            filename="infoAsistencias"
-            sheet="pagAsistencias"
-            buttonText="Exportar a Excel"
-          />
-        </div>
-      </div>
+      <h1>Asistencias</h1>
+      
 
-      <Table striped bordered hover id="infoAsistencias">
+      <Table striped bordered hover>
         <thead className="table-dark table-bg-scale-50 headerToExcel">
           <tr>
             <th>Tipo de asistencia</th>
