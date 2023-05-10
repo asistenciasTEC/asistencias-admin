@@ -1,33 +1,14 @@
 import { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-  orderBy,
-} from "firebase/firestore";
-import {
-  Table,
-  Modal,
-  Form,
-  Button,
-  Pagination,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { collection, query, where, getDocs, updateDoc, orderBy } from "firebase/firestore";
+import { Table, Modal, Form, Button, Pagination, Row, Col } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
-// import ExportExcel from "react-export-excel";
+
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
 import { MdInfo } from "react-icons/md";
-import ExportCSV from "./exportCsv";
-
-// const ExcelFile = ExportExcel.ExcelFile;
-// const ExcelSheet = ExportExcel.ExcelSheet;
-// const ExcelColumn = ExportExcel.ExcelColumn;
+import ExportExcel from "./exportExcel";
 
 const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -53,7 +34,7 @@ const Gestion = () => {
     boleta: "",
     condicion: "",
     horasAsignadas: "",
-    fecha: "",
+    fecha: ""
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -83,22 +64,19 @@ const Gestion = () => {
     boleta,
     condicion,
     horasAsignadas,
-    fecha,
+    fecha
   } = dataForm;
 
   const handleChange = (e) => {
     setDataForm({
       ...dataForm,
-      [e.target.id]: e.target.value,
-    });
-  };
+      [e.target.id]: e.target.value
+    })
+  }
 
   useEffect(() => {
     const obtenerSolicitudes = async () => {
-      const querySolicitudesCollection = query(
-        collection(db, "solicitudes"),
-        orderBy("fecha", "desc")
-      );
+      const querySolicitudesCollection = query(collection(db, "solicitudes"), orderBy("fecha", "desc"));
       const snapshot = await getDocs(querySolicitudesCollection);
       const listaSolicitudes = snapshot.docs.map((doc) => ({
         ...doc.data(),
@@ -133,7 +111,7 @@ const Gestion = () => {
       boleta: solicitud.boleta,
       condicion: solicitud.condicion,
       horasAsignadas: solicitud.horasAsignadas,
-      fecha: solicitud.fecha,
+      fecha: solicitud.fecha
     });
     setShowModal(true);
   };
@@ -167,7 +145,7 @@ const Gestion = () => {
         boleta,
         condicion: "Aceptado",
         horasAsignadas,
-        fecha,
+        fecha
       };
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
@@ -186,6 +164,7 @@ const Gestion = () => {
       );
       setSolicitudes(listaSolicitudesActualizada);
       cerrarModal();
+
     } else {
       cerrarModal();
       toast.error("Ha ocurrido un error al aceptar.");
@@ -220,7 +199,7 @@ const Gestion = () => {
         boleta,
         condicion: "Rechazado",
         horasAsignadas,
-        fecha,
+        fecha
       };
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
@@ -263,32 +242,21 @@ const Gestion = () => {
   //Busqueda
   const buscarEnLista = (terminoBusqueda) => {
     const resultadosBusq = [];
-    if (valorSeleccionado === "default" || valorSeleccionado === "") {
+    if (
+      valorSeleccionado === "default" ||
+      valorSeleccionado === ""
+    ) {
       for (let i = 0; i < solicitudes.length; i++) {
         if (
-          solicitudes[i].carne.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].nombre.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].apellido1.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].apellido2.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          (
-            solicitudes[i].nombre +
-            " " +
-            solicitudes[i].apellido1 +
-            " " +
-            solicitudes[i].apellido2
-          ).toLowerCase() === terminoBusqueda.toLowerCase() ||
-          solicitudes[i].tipoAsistencia.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].cursoAsistir.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].profesorAsistir.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].condicion.toLowerCase() ===
-            terminoBusqueda.toLowerCase()
+          solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido1.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido2.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          (solicitudes[i].nombre + ' ' + solicitudes[i].apellido1 + ' ' + solicitudes[i].apellido2).toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -296,8 +264,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "carne") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
+        if (solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -305,20 +272,12 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "nombre") {
       for (let i = 0; i < solicitudes.length; i++) {
+
         if (
-          solicitudes[i].nombre.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].apellido1.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          solicitudes[i].apellido2.toLowerCase() ===
-            terminoBusqueda.toLowerCase() ||
-          (
-            solicitudes[i].nombre +
-            " " +
-            solicitudes[i].apellido1 +
-            " " +
-            solicitudes[i].apellido2
-          ).toLowerCase() === terminoBusqueda.toLowerCase()
+          solicitudes[i].nombre.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido1.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          solicitudes[i].apellido2.toLowerCase() === terminoBusqueda.toLowerCase() ||
+          (solicitudes[i].nombre + ' ' + solicitudes[i].apellido1 + ' ' + solicitudes[i].apellido2).toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -326,9 +285,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "tipoAsistencia") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].tipoAsistencia.toLowerCase() ===
-          terminoBusqueda.toLowerCase()
+        if (solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -336,9 +293,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "cursoAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].cursoAsistir.toLowerCase() ===
-          terminoBusqueda.toLowerCase()
+        if (solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -346,9 +301,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "profesorAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].profesorAsistir.toLowerCase() ===
-          terminoBusqueda.toLowerCase()
+        if (solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -356,9 +309,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "condicion") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].condicion.toLowerCase() ===
-          terminoBusqueda.toLowerCase()
+        if (solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -366,9 +317,7 @@ const Gestion = () => {
     }
     if (valorSeleccionado === "horasAsignadas") {
       for (let i = 0; i < solicitudes.length; i++) {
-        if (
-          solicitudes[i].horasAsignadas.toLowerCase() ===
-          terminoBusqueda.toLowerCase()
+        if (solicitudes[i].horasAsignadas.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
@@ -384,23 +333,20 @@ const Gestion = () => {
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }
-
   const solicitudesAceptadas = solicitudes.filter((objeto) => objeto.condicion === "Aceptado");
+  //Orden
   return (
     <div className="container-lg ">
       <div className="containerToTitleAndExportToExcel">
         <h1>Gestión</h1>
         <div>
-          <h1>Exportar a CSV</h1>
-          <ExportCSV data={solicitudesAceptadas} fileName="data.csv" />
+          <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
         </div>
       </div>
       <div className="row mb-2 justify-content-end">
         <div className="col-3">
-          <Form.Select
-            aria-label="Default select example"
-            onChange={handleSelectChange}
-          >
+          <Form.Select aria-label="Default select example"
+            onChange={handleSelectChange}>
             <option value="default">Filtros</option>
             <option value="carne">Por Carné</option>
             <option value="nombre">Por Nombre</option>
@@ -422,7 +368,7 @@ const Gestion = () => {
         </div>
       </div>
 
-      <Table striped bordered hover id="infoGestion">
+      <Table striped bordered hover>
         <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Carné</th>
@@ -439,9 +385,7 @@ const Gestion = () => {
           {currentItems.map((solicitud) => (
             <tr key={solicitud.id}>
               <td>{solicitud.carne}</td>
-              <td>
-                {solicitud.nombre} {solicitud.apellido1} {solicitud.apellido2}
-              </td>
+              <td>{solicitud.nombre} {solicitud.apellido1} {solicitud.apellido2}</td>
               <td>{solicitud.tipoAsistencia}</td>
               <td>{solicitud.cursoAsistir}</td>
               <td>{solicitud.profesorAsistir}</td>
@@ -495,7 +439,7 @@ const Gestion = () => {
                     type="text"
                     value={apellido1}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -507,7 +451,7 @@ const Gestion = () => {
                     type="number"
                     value={carne}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -520,7 +464,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={cuentaBancaria}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -532,7 +476,7 @@ const Gestion = () => {
                     type="text"
                     value={tipoAsistencia}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -545,7 +489,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={promedioPondSemAnt}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -558,7 +502,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={semestresActivo}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -573,7 +517,7 @@ const Gestion = () => {
                     type="text"
                     value={apellido2}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -585,7 +529,7 @@ const Gestion = () => {
                     type="number"
                     value={cedula}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -598,7 +542,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={cuentaIBAN}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -611,7 +555,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={profesorAsistir}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -624,7 +568,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={créditosAproSemAnt}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -637,7 +581,7 @@ const Gestion = () => {
                     placeholder="Aqui va a ir la boleta"
                     value={boleta}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -651,7 +595,7 @@ const Gestion = () => {
                     type="text"
                     value={nombre}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -663,7 +607,7 @@ const Gestion = () => {
                     type="text"
                     value={correo}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -675,7 +619,7 @@ const Gestion = () => {
                     type="number"
                     value={telefono}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -688,7 +632,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={cursoAsistir}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -701,7 +645,7 @@ const Gestion = () => {
                     placeholder="N/A"
                     value={notaCursoAsistir}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -713,7 +657,7 @@ const Gestion = () => {
                     type="text"
                     value={condicion}
                     onChange={handleChange}
-                    autoComplete="off"
+                    autoComplete='off'
                     required
                     disabled
                   />
@@ -742,31 +686,21 @@ const Gestion = () => {
                 max={10}
                 value={horasAsignadas}
                 onChange={handleChange}
-                autoComplete="off"
+                autoComplete='off'
                 required
               />
             </Form.Group>
+
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={cerrarModal}>
             Cancelar
           </Button>{" "}
-          <Button
-            id="botonRechazar"
-            form="form1"
-            variant="danger"
-            type="submit"
-          >
+          <Button id="botonRechazar" form="form1" variant="danger" type="submit">
             Rechazar
           </Button>{" "}
-          <Button
-            id="botonAceptar"
-            form="form1"
-            variant="success"
-            type="submit"
-            onClick={aceptarGestion}
-          >
+          <Button id="botonAceptar" form="form1" variant="success" type="submit" onClick={aceptarGestion}>
             Aceptar
           </Button>
         </Modal.Footer>
@@ -774,6 +708,6 @@ const Gestion = () => {
       <ToastContainer />
     </div>
   );
-};
+}
 
-export default Gestion;
+export default Gestion
