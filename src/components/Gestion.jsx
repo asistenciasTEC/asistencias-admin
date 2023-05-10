@@ -41,6 +41,7 @@ const Gestion = () => {
     nombre: "",
     promedioPondSemAnt: "",
     créditosAproSemAnt: "",
+    semestresActivo: "",
     correo: "",
     telefono: "",
     cuentaBancaria: "",
@@ -70,6 +71,7 @@ const Gestion = () => {
     nombre,
     promedioPondSemAnt,
     créditosAproSemAnt,
+    semestresActivo,
     correo,
     telefono,
     cuentaBancaria,
@@ -119,6 +121,7 @@ const Gestion = () => {
       nombre: solicitud.nombre,
       promedioPondSemAnt: solicitud.promedioPondSemAnt,
       créditosAproSemAnt: solicitud.créditosAproSemAnt,
+      semestresActivo: solicitud.semestresActivo,
       correo: solicitud.correo,
       telefono: solicitud.telefono,
       cuentaBancaria: solicitud.cuentaBancaria,
@@ -152,6 +155,7 @@ const Gestion = () => {
         nombre,
         promedioPondSemAnt,
         créditosAproSemAnt,
+        semestresActivo,
         correo,
         telefono,
         cuentaBancaria,
@@ -204,6 +208,7 @@ const Gestion = () => {
         nombre,
         promedioPondSemAnt,
         créditosAproSemAnt,
+        semestresActivo,
         correo,
         telefono,
         cuentaBancaria,
@@ -546,18 +551,19 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="horario">
-                  <Form.Label>Horario</Form.Label>
+                <Form.Group className="mb-3" controlId="semestresActivo">
+                  <Form.Label>Cantidad de Semestres Activo</Form.Label>
                   <Form.Control
-                    type="text"
-                    placeholder="Aqui va a ir el horario"
-                    value={horario}
+                    type="number"
+                    placeholder="N/A"
+                    value={semestresActivo}
                     onChange={handleChange}
                     autoComplete="off"
                     required
                     disabled
                   />
                 </Form.Group>
+
               </Col>
 
               <Col>
@@ -714,6 +720,19 @@ const Gestion = () => {
                 </Form.Group>
               </Col>
             </Row>
+
+            <Form.Group className="mb-3" controlId="horario">
+              <Form.Label>Horario</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Aqui va a ir el horario"
+                value={horario}
+                onChange={handleChange}
+                autoComplete='off'
+                required
+                disabled
+              />
+            </Form.Group>
 
             <Form.Group className="mb-3" controlId="horasAsignadas">
               <Form.Label>Horas Asignadas</Form.Label>
