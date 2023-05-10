@@ -16,6 +16,7 @@ const ExportExcel = ({ data, fileName }) => {
     "tipoAsistencia",
     "cuentaBancaria",
     "cuentaIBAN",
+    "semestresActivo",
     "profesorAsistir",
     "cursoAsistir",
     "notaCursoAsistir",
@@ -40,7 +41,7 @@ const ExportExcel = ({ data, fileName }) => {
   };
 
   return (
-    <button onClick={handleDownloadExcel}>
+    <button className="btn btn-success"onClick={handleDownloadExcel}>
       Exportar a Excel
     </button>
   );
