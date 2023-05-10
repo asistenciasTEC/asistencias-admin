@@ -8,6 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
 import { MdInfo } from "react-icons/md";
+import ExportExcel from "./exportExcel";
 
 const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -332,11 +333,16 @@ const Gestion = () => {
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }
-
+  const solicitudesAceptadas = solicitudes.filter((objeto) => objeto.condicion === "Aceptado");
   //Orden
   return (
     <div className="container-lg ">
-      <h1>Gestión</h1>
+      <div className="containerToTitleAndExportToExcel">
+        <h1>Gestión</h1>
+        <div>
+          <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
+        </div>
+      </div>
       <div className="row mb-2 justify-content-end">
         <div className="col-3">
           <Form.Select aria-label="Default select example"

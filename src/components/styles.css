@@ -149,3 +149,8 @@ input {
    text-align: center;;
 }
 
+.containerToTitleAndExportToExcel{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

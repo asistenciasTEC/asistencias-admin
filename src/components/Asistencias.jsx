@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import {collection, query, where, getDocs, updateDoc} from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { Table, Modal, Form, Button } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 
@@ -7,8 +13,7 @@ import { db } from "../config/firebase/firebase";
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import {MdEdit} from "react-icons/md";
-
+import { MdEdit } from "react-icons/md";
 function Asistencias() {
   const [asistencias, setAsistencias] = useState([].sort());
   const [dataForm, setDataForm] = useState({
@@ -23,7 +28,14 @@ function Asistencias() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
 
-  const { id, tipoAsistencia, promedioPonderado, notaCurso, semestresActivos, creditosAprobados } = dataForm;
+  const {
+    id,
+    tipoAsistencia,
+    promedioPonderado,
+    notaCurso,
+    semestresActivos,
+    creditosAprobados,
+  } = dataForm;
   const handleChange = (e) => {
     setDataForm({
       ...dataForm,
@@ -44,17 +56,17 @@ function Asistencias() {
   }, []);
 
   const abrirModal = (accion, id = "") => {
-      const asistencia = asistencias.find((asistencia) => asistencia.id === id);
-      setModalTitle("Editar requisitos");
-      setModalAction("Guardar cambios");
-      setDataForm({
-        id: asistencia.id,
-        tipoAsistencia: asistencia.tipoAsistencia,
-        promedioPonderado: asistencia.promedioPonderado,
-        notaCurso: asistencia.notaCurso,
-        semestresActivos: asistencia.semestresActivos,
-        creditosAprobados: asistencia.creditosAprobados,
-      });
+    const asistencia = asistencias.find((asistencia) => asistencia.id === id);
+    setModalTitle("Editar requisitos");
+    setModalAction("Guardar cambios");
+    setDataForm({
+      id: asistencia.id,
+      tipoAsistencia: asistencia.tipoAsistencia,
+      promedioPonderado: asistencia.promedioPonderado,
+      notaCurso: asistencia.notaCurso,
+      semestresActivos: asistencia.semestresActivos,
+      creditosAprobados: asistencia.creditosAprobados,
+    });
     setShowModal(true);
   };
 
@@ -64,7 +76,13 @@ function Asistencias() {
 
   const editarAsistencia = async (e) => {
     e.preventDefault();
-    const asistenciaActualizado = { tipoAsistencia, promedioPonderado, notaCurso, semestresActivos, creditosAprobados };
+    const asistenciaActualizado = {
+      tipoAsistencia,
+      promedioPonderado,
+      notaCurso,
+      semestresActivos,
+      creditosAprobados,
+    };
     const q = query(collection(db, "asistencias"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
@@ -87,8 +105,10 @@ function Asistencias() {
   return (
     <div className="container-lg ">
       <h1>Asistencias</h1>
+      
+
       <Table striped bordered hover>
-        <thead className="table-dark table-bg-scale-50">
+        <thead className="table-dark table-bg-scale-50 headerToExcel">
           <tr>
             <th>Tipo de asistencia</th>
             <th>Promedio Ponderado</th>
@@ -112,20 +132,20 @@ function Asistencias() {
                   variant="warning"
                   onClick={() => abrirModal("editar", asistencia.id)}
                 >
-                  <MdEdit/>
+                  <MdEdit />
                 </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
+
       <Modal show={showModal} onHide={cerrarModal}>
         <Modal.Header closeButton>
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form id="form1" onSubmit={editarAsistencia}>
-            
             <Form.Group className="mb-3" controlId="tipoAsistencia">
               <Form.Label>Tipo de asistencia</Form.Label>
               <Form.Control
@@ -184,7 +204,6 @@ function Asistencias() {
                 required
               />
             </Form.Group>
-
           </Form>
         </Modal.Body>
         <Modal.Footer>
