@@ -21,15 +21,39 @@ const ExportExcel = ({ data, fileName }) => {
     "cursoAsistir",
     "notaCursoAsistir",
     "horario",
-    "boleta",
     "condicion",
     "horasAsignadas",
     "fecha",
   ];
+  const order2 = [
+    "ID",
+    "Carne",
+    "Primer Apellido",
+    "Segundo Apellido",
+    "Nombre",
+    "Cédula",
+    "Correo",
+    "Teléfono",
+    "Promedio Ponderado Semestre Anterior",
+    "Créditos Aprobados Semestre Anterior",
+    "Tipo Asistencia",
+    "Cuenta Bancaria",
+    "Cuenta IBAN",
+    "Semestres Activo",
+    "Profesor Asistir",
+    "Curso Asistir",
+    "Nota Curso Asistir",
+    "Horario",
+    "Condicion",
+    "Horas Asignadas",
+    "Fecha",
+  ];
+
 
   const headers = order;
+  const headerOrder = order2
   const formattedData = [
-    headers,
+    headerOrder,
     ...data.map((item) => headers.map((header) => item[header] ?? "")),
   ];
 
@@ -41,7 +65,7 @@ const ExportExcel = ({ data, fileName }) => {
   };
 
   return (
-    <button className="btn btn-success"onClick={handleDownloadExcel}>
+    <button className="btn btn-success" onClick={handleDownloadExcel}>
       Exportar a Excel
     </button>
   );
