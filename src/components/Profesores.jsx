@@ -9,12 +9,11 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
-import { db } from "../config/firebase/firebase";
+import { db, auth } from "../config/firebase/firebase";
 import { v4 as uuid } from "uuid";
-//librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
-//librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete} from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete } from "react-icons/md";
+import { createUserWithEmailAndPassword } from "firebase/auth"
 
 function Profesores() {
   const [profesores, setProfesores] = useState([]);
@@ -26,7 +25,7 @@ function Profesores() {
     password: "",
   });
   const [showModalEliminar, setShowModalEliminar] = useState(false);
-  const [showModalModificar,setShowModalModificar] = useState(false);
+  const [showModalModificar, setShowModalModificar] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalAction, setModalAction] = useState("");
@@ -49,7 +48,7 @@ function Profesores() {
     setShowModalModificar(true);
   }
 
-  const handleConfirmModify =  () => {
+  const handleConfirmModify = () => {
     editarProfesor(profesorAModificar);
     setShowModalModificar(true);
   };
@@ -59,7 +58,6 @@ function Profesores() {
   };
 
   const handleConfirmClick = () => {
-    // Lógica para eliminar el elemento
     eliminarProfesor(profesorAEliminar);
     setShowModalEliminar(false);
   };
@@ -105,7 +103,6 @@ function Profesores() {
     setShowModalModificar(false);
   };
   function buscarProfesor(email) {
-    // console.log(email)
     for (let i = 0; i < profesores.length; i++) {
       if (profesores[i].email === email) {
         return profesores[i];
@@ -116,11 +113,13 @@ function Profesores() {
   const agregarProfesor = async (e) => {
     e.preventDefault();
     const nuevoProfesor = { id: uuid(), nombre, email, password };
-    const nuevoProf = {id:nuevoProfesor.id, nombre:nuevoProfesor.nombre, email:nuevoProfesor.email.toLowerCase(), password:nuevoProfesor.password}
+    const nuevoProf = { id: nuevoProfesor.id, nombre: nuevoProfesor.nombre, email: nuevoProfesor.email.toLowerCase(), password: nuevoProfesor.password }
     if (buscarProfesor(email) === null || profesores.length === 0) {
       await addDoc(collection(db, "profesores"), nuevoProf);
-      setProfesores([nuevoProf,...profesores,]);
+      setProfesores([nuevoProf, ...profesores,]);
+      await createUserWithEmailAndPassword(auth, nuevoProfesor.email, nuevoProfesor.password)
       toast.success("Profesor agregado exitosamente.");
+
       cerrarModal();
     } else if (buscarProfesor(email) !== null) {
       toast.error("El email a registrar ya existe");
@@ -202,7 +201,7 @@ function Profesores() {
     }
     if (valorSeleccionado === "correo") {
       for (let i = 0; i < profesores.length; i++) {
-        if(profesores[i].email.toLowerCase()===terminoBusqueda.toLowerCase()){
+        if (profesores[i].email.toLowerCase() === terminoBusqueda.toLowerCase()) {
           resultadosBusq.push(profesores[i]);
         }
       }
