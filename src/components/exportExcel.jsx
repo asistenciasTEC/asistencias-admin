@@ -72,5 +72,3 @@ const ExportExcel = ({ data, fileName }) => {
 };
 
 export default ExportExcel;
-
-
