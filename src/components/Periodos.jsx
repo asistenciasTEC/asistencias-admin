@@ -24,6 +24,10 @@ const Periodos = () => {
     horasEspecialRes: "",
     horasEstudianteRes: "",
     horasTutoriaRes: "",
+    horasAsistenteAux: "",
+    horasEspecialAux: "",
+    horasEstudianteAux: "",
+    horasTutoriaAux: "",
     estado: "",
     fecha: ""
   });
@@ -51,8 +55,15 @@ const Periodos = () => {
     horasEspecial,
     horasEstudiante,
     horasTutoria,
+    horasAsistenteRes,
+    horasEspecialRes,
+    horasEstudianteRes,
+    horasTutoriaRes,
+    horasAsistenteAux,
+    horasEspecialAux,
+    horasEstudianteAux,
+    horasTutoriaAux,
     estado,
-    fecha
   } = dataForm;
 
   useEffect(() => {
@@ -107,8 +118,12 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
+        horasAsistenteAux: periodo.horasAsistenteAux,
+        horasEspecialAux: periodo.horasEspecialAux,
+        horasEstudianteAux: periodo.horasEstudianteAux,
+        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: false,
-        fecha: periodo.fecha
+        fecha: serverTimestamp()
       });
     } else {
       setDataForm({
@@ -123,8 +138,12 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
+        horasAsistenteAux: periodo.horasAsistenteAux,
+        horasEspecialAux: periodo.horasEspecialAux,
+        horasEstudianteAux: periodo.horasEstudianteAux,
+        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: true,
-        fecha: periodo.fecha
+        fecha: serverTimestamp()
       });
     }
     setShowModalActivacion(true);
@@ -176,6 +195,10 @@ const Periodos = () => {
         horasEspecialRes: "",
         horasEstudianteRes: "",
         horasTutoriaRes: "",
+        horasAsistenteAux: "",
+        horasEspecialAux: "",
+        horasEstudianteAux: "",
+        horasTutoriaAux: "",
         estado: "",
         fecha: ""
       });
@@ -196,8 +219,12 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
+        horasAsistenteAux: periodo.horasAsistenteAux,
+        horasEspecialAux: periodo.horasEspecialAux,
+        horasEstudianteAux: periodo.horasEstudianteAux,
+        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: periodo.estado,
-        fecha: periodo.fecha
+        fecha: periodo.fecha,
       });
     }
     setShowModal(true);
@@ -232,6 +259,10 @@ const Periodos = () => {
       horasEspecialRes: horasEspecial,
       horasEstudianteRes: horasEstudiante,
       horasTutoriaRes: horasTutoria,
+      horasAsistenteAux: horasAsistente,
+      horasEspecialAux: horasEspecial,
+      horasEstudianteAux: horasEstudiante,
+      horasTutoriaAux: horasTutoria,
       estado: false,
       fecha: serverTimestamp()
     };
@@ -290,12 +321,16 @@ const Periodos = () => {
       horasEspecial,
       horasEstudiante,
       horasTutoria,
-      horasAsistenteRes: horasAsistente,
-      horasEspecialRes: horasEspecial,
-      horasEstudianteRes: horasEstudiante,
-      horasTutoriaRes: horasTutoria,
+      horasAsistenteRes: parseInt(horasAsistenteRes) - parseInt(horasAsistenteAux) + parseInt(horasAsistente),
+      horasEspecialRes: parseInt(horasEspecialRes) - parseInt(horasEspecialAux) + parseInt(horasEspecial),
+      horasEstudianteRes: parseInt(horasEstudianteRes) - parseInt(horasEstudianteAux) + parseInt(horasEstudiante),
+      horasTutoriaRes: parseInt(horasTutoriaRes) - parseInt(horasTutoriaAux) + parseInt(horasTutoria),
+      horasAsistenteAux: horasAsistente,
+      horasEspecialAux: horasEspecial,
+      horasEstudianteAux: horasEstudiante,
+      horasTutoriaAux: horasTutoria,
       estado,
-      fecha
+      fecha: serverTimestamp()
     };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
