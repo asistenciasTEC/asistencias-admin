@@ -23,22 +23,35 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
-    if (!email || !password) {
-      setData({ ...data, error: "Todos los campos son obligatorios" });
-    }
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setData({
-        email: "",
-        password: "",
-        error: null,
-        loading: false,
-      });
-      history("/");
-    } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
+      if (!email || !password) {
+        setData({ ...data, error: "Todos los campos son obligatorios", loading: false });
+      } else {
+        try {
+          if (email === "vargasdaniel195@gmail.com") {
+            await signInWithEmailAndPassword(auth, email, password);
+            setData({
+              email: "",
+              password: "",
+              error: null,
+              loading: false,
+            });
+            history("/");
+          } else {
+            throw new Error("El correo no tiene permisos para acceder");
+          }
+        } catch (error) {
+          setData({ ...data, error: error.message, loading: false });
+          toast.error(error.message);
+        }
+      }
+    } catch (error) {
+      setData({ ...data, error: error.message, loading: false });
     }
   };
+
+
 
   const restablecerContraseña = async (e) => {
     sendPasswordResetEmail(auth, email)
