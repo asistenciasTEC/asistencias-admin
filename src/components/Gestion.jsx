@@ -14,6 +14,7 @@ const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [dataForm, setDataForm] = useState({
     id: "",
+    idPeriodo: "",
     tipoAsistencia: "",
     cedula: "",
     carne: "",
@@ -25,6 +26,7 @@ const Gestion = () => {
     semestresActivo: "",
     correo: "",
     telefono: "",
+    tipoBanco: "",
     cuentaBancaria: "",
     cuentaIBAN: "",
     profesorAsistir: "",
@@ -37,6 +39,16 @@ const Gestion = () => {
     fecha: ""
   });
 
+  const [horasRestantes, setHorasRestantes] = useState({
+    horasAsistente: 1000,
+    horasEspecial: 1000,
+    horasEstudiante: 1000,
+    horasTutoria: 1000
+  })
+
+  const [periodoActivo, setPeriodoActivo] = useState("");
+
+
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [resultados, setResultados] = useState([]);
@@ -44,6 +56,7 @@ const Gestion = () => {
 
   const {
     id,
+    idPeriodo,
     tipoAsistencia,
     cedula,
     carne,
@@ -55,6 +68,7 @@ const Gestion = () => {
     semestresActivo,
     correo,
     telefono,
+    tipoBanco,
     cuentaBancaria,
     cuentaIBAN,
     profesorAsistir,
@@ -82,6 +96,21 @@ const Gestion = () => {
         ...doc.data(),
       }));
       setSolicitudes(listaSolicitudes);
+
+      // const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
+      // const querySnapshot = await getDocs(querySolicitudesCollection);
+      // if (!querySnapshot.empty) {
+      //   const documento = queryPeriodo.docs[0];
+      //   setPeriodoActivo(documento)
+      //   setHorasRestantes({
+      //     horasAsistente: periodoActivo.horasAsistente,
+      //     horasEspecial: periodoActivo.horasEspecial,
+      //     horasEstudiante: periodoActivo.horasEspecial,
+      //     horasTutoria: periodoActivo.horasEspecial
+      //   })
+      // } else {
+      //   console.log("Eror: No hay periodo activo");
+      // }
     };
     obtenerSolicitudes();
   }, []);
@@ -339,6 +368,12 @@ const Gestion = () => {
     <div className="container-lg ">
       <div className="containerToTitleAndExportToExcel">
         <h1>Gestión</h1>
+        <h5>
+          H.Asi: <span style={{ color: 'red' }}>{horasRestantes.horasAsistente}</span> --
+          H.Est: <span style={{ color: 'red' }}>{horasRestantes.horasEstudiante}</span> --
+          H.Esp: <span style={{ color: 'red' }}>{horasRestantes.horasEspecial}</span> --
+          H.Tut: <span style={{ color: 'red' }}>{horasRestantes.horasTutoria}</span>
+        </h5>
         <div>
           <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
         </div>
