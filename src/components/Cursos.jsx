@@ -11,9 +11,7 @@ import {
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
 import { v4 as uuid } from "uuid";
-//librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
-//librería de iconos boostrap para react
 import { MdAddBox, MdEdit, MdDelete } from "react-icons/md";
 
 function Cursos() {
@@ -92,7 +90,6 @@ function Cursos() {
     }
   }
 
-  //Confirm update
   const handleUpdateClick = (e) => {
     e.preventDefault();
     setCursoAEditar(e);
@@ -171,7 +168,6 @@ function Cursos() {
     setCursos(listaCursosActualizada);
   };
 
-  //Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages =
@@ -309,12 +305,7 @@ function Cursos() {
             </tr>
           ))}
         </tbody>
-
-
       </Table>
-
-
-
       <Pagination className="justify-content-center">
         <Pagination.Prev
           disabled={currentPage === 1}

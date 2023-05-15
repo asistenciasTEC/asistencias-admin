@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth} from "../config/firebase/firebase";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../config/firebase/firebase";
 import { useNavigate } from "react-router-dom";
-
+import { toast, ToastContainer } from "react-toastify";
 const Login = () => {
   const [data, setData] = useState({
     email: "",
@@ -24,7 +24,7 @@ const Login = () => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
     if (!email || !password) {
-      setData({ ...data, error: "Todos los campos son obligatorios"});
+      setData({ ...data, error: "Todos los campos son obligatorios" });
     }
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -38,6 +38,16 @@ const Login = () => {
     } catch (err) {
       setData({ ...data, error: err.message, loading: false });
     }
+  };
+
+  const restablecerContraseña = async (e) => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        toast.success("Se envio un correo de restablecimiento de contraseña");
+      })
+      .catch((error) => {
+        toast.error("Tiene que añadir un correo en el espacio designado");
+      });
   };
   return (
     <section>
@@ -67,8 +77,15 @@ const Login = () => {
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
         </div>
+        <div className="btn_container">
+          <button href="/" type="button" className="btn_restablecer" onClick={() => {
+            restablecerContraseña();
+          }}>¿Olvido su contraseña?</button >
+        </div>
       </form>
+      <ToastContainer />
     </section>
+
   );
 };
 
