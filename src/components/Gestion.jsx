@@ -40,14 +40,13 @@ const Gestion = () => {
   });
 
   const [horasRestantes, setHorasRestantes] = useState({
-    horasAsistente: 1000,
-    horasEspecial: 1000,
-    horasEstudiante: 1000,
-    horasTutoria: 1000
+    horasAsistente: "",
+    horasEspecial: "",
+    horasEstudiante: "",
+    horasTutoria: ""
   })
 
   const [periodoActivo, setPeriodoActivo] = useState("");
-
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -96,23 +95,26 @@ const Gestion = () => {
         ...doc.data(),
       }));
       setSolicitudes(listaSolicitudes);
-
-      // const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
-      // const querySnapshot = await getDocs(querySolicitudesCollection);
-      // if (!querySnapshot.empty) {
-      //   const documento = queryPeriodo.docs[0];
-      //   setPeriodoActivo(documento)
-      //   setHorasRestantes({
-      //     horasAsistente: periodoActivo.horasAsistente,
-      //     horasEspecial: periodoActivo.horasEspecial,
-      //     horasEstudiante: periodoActivo.horasEspecial,
-      //     horasTutoria: periodoActivo.horasEspecial
-      //   })
-      // } else {
-      //   console.log("Eror: No hay periodo activo");
-      // }
     };
     obtenerSolicitudes();
+
+    const obtenerPeriodo = async () => {
+      const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshot = await getDocs(queryPeriodo);
+      if (!querySnapshot.empty) {
+        const documento = querySnapshot.docs[0];
+        setPeriodoActivo(documento)
+        setHorasRestantes({
+          horasAsistente: periodoActivo.horasAsistente,
+          horasEspecial: periodoActivo.horasEspecial,
+          horasEstudiante: periodoActivo.horasEspecial,
+          horasTutoria: periodoActivo.horasEspecial
+        })
+      } else {
+        console.log("Eror: No hay periodo activo");
+      }
+    };
+    obtenerPeriodo()
   }, []);
 
   const abrirModal = (id) => {
