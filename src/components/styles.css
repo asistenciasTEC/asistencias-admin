@@ -3,6 +3,12 @@ body {
 }
 
 /* Navbar    */
+.btnLogin {
+    color: white;
+    height: 23px;
+    width: 23px;
+    margin-bottom: 0.5rem;
+}
 
 .NavContainer {
     padding: 1rem;
@@ -13,12 +19,12 @@ body {
 }
 
 
-.NavContainer h2{
+.NavContainer h2 {
     font-weight: 200;
     color: white;
 }
 
-.Scroll a{
+.Scroll a {
     color: rgb(224, 209, 209);
     text-decoration: none;
     margin-right: 1rem;
@@ -26,31 +32,48 @@ body {
 
 
 
-.Scroll a:hover{
+.Scroll a:hover {
     color: white;
 }
 
-.btnLogout{
+.btnLogout {
     background: none;
     text-align: center;
     border: none;
 }
 
-.btnLogout svg{
+.btnLogout svg {
     color: white;
 }
 
+/* Usuario */
+.formContainer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+}
+
 /*   Login */
+
+.btn_restablecer {
+    border: None;
+    background: none;
+    color: blue;
+    display: flex;
+    justify-content: center;
+}
 
 section {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; 
+    height: 100vh;
 }
-  
-  
+
+
 .form {
     display: flex;
     flex-direction: column;
@@ -60,28 +83,28 @@ section {
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
-  
+
 .input_container {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
 }
-  
+
 label {
     margin-bottom: 5px;
 }
-  
+
 input {
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
 }
-  
+
 .btn_container {
     display: flex;
     justify-content: center;
 }
-  
+
 .btnIngresar {
     background-color: #007bff;
     color: #fff;
@@ -91,18 +114,18 @@ input {
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
-  
+
 .btnIngresar:hover {
     background-color: #0069d9;
 }
-  
+
 .error {
     color: red;
     margin-top: 10px;
 }
 
 @media (max-width: 768px) {
-    .NavContainer{
+    .NavContainer {
         flex-direction: column;
     }
 }
@@ -119,7 +142,7 @@ input {
     align-items: center;
 }
 
-.pagImagen img{
+.pagImagen img {
     text-align: center;
     width: 50%;
     height: auto;
@@ -127,29 +150,30 @@ input {
     margin: 0 auto;
 }
 
-.pagText{
+.pagText {
     text-align: center;
     display: block;
     margin: 0;
 }
-  
+
 
 
 /* Not Found */
 
-.pagNotFound{
+.pagNotFound {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-.pagNotFound h3{
-   color: red;
-   text-align: center;;
+.pagNotFound h3 {
+    color: red;
+    text-align: center;
+    ;
 }
 
-.containerToTitleAndExportToExcel{
+.containerToTitleAndExportToExcel {
     display: flex;
     justify-content: space-between;
     align-items: center;

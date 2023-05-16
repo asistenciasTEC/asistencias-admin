@@ -4,15 +4,25 @@ import { auth } from "../config/firebase/firebase";
 
 export const AuthContext = createContext()
 
-const AuthProvider = ({children}) => {
+const AuthProvider = ({ children }) => {
+
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        onAuthStateChanged(auth, user => {
-           setUser(user);
+        const unsubscribe = onAuthStateChanged(auth, user => {
+            setUser(user);
+            setLoading(false);
         });
+
+        return () => unsubscribe();
     }, []);
-    return <AuthContext.Provider value = {{user}}>{children}</AuthContext.Provider>;
+
+    if (loading) {
+        return <div>Cargando...</div>;
+    }
+
+    return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
 }
 
 export default AuthProvider;
