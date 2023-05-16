@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete } from "react-icons/md";
+import { MdAddBox, MdEdit, MdDelete, MdCheckBox, MdCancel } from "react-icons/md";
 
 const Periodos = () => {
   const [periodos, setPeriodos] = useState([]);
@@ -20,8 +20,16 @@ const Periodos = () => {
     horasEspecial: "",
     horasEstudiante: "",
     horasTutoria: "",
+    horasAsistenteRes: "",
+    horasEspecialRes: "",
+    horasEstudianteRes: "",
+    horasTutoriaRes: "",
+    estado: "",
     fecha: ""
   });
+
+  const [showModalActivacion, setShowModalActivacion] = useState(false);
+  const [infoActivacion, setInfoActivacion] = useState({});
 
   const [showModalEliminar, setShowModalEliminar] = useState(false);
   const [periodoAEliminar, setPeriodoAELiminar] = useState("");
@@ -43,7 +51,11 @@ const Periodos = () => {
     horasEspecial,
     horasEstudiante,
     horasTutoria,
-    fecha
+    horasAsistenteRes,
+    horasEspecialRes,
+    horasEstudianteRes,
+    horasTutoriaRes,
+    estado,
   } = dataForm;
 
   useEffect(() => {
@@ -53,6 +65,23 @@ const Periodos = () => {
       const listaPeriodos = snapshot.docs.map((doc) => ({
         ...doc.data(),
       }));
+
+      // Verificar si existe algún periodo con estado en true
+      const algunPeriodoActivo = listaPeriodos.some((periodo) => periodo.estado);
+      // Cambiar el estado basado en si existe algún periodo activo
+      if (algunPeriodoActivo) {
+        setInfoActivacion({
+          existeActivo: true,
+          title: "Confirmar desactivación",
+          body: "¿Estás seguro que quieres desactivar este periodo?"
+        })
+      } else {
+        setInfoActivacion({
+          existeActivo: false,
+          title: "Confirmar activación",
+          body: "¿Estás seguro que quieres activar este periodo?"
+        })
+      }
       setPeriodos(listaPeriodos);
     };
     obtenerPeriodos();
@@ -64,6 +93,50 @@ const Periodos = () => {
       [e.target.id]: e.target.value
     })
   }
+
+  //Activar/desactivar periodo
+  const handleActivacionClick = (id) => {
+    const periodo = periodos.find((periodo) => periodo.id === id);
+    if (infoActivacion.existeActivo) {
+      setDataForm({
+        id: periodo.id,
+        year: periodo.year,
+        semestre: periodo.semestre,
+        horasAsistente: periodo.horasAsistente,
+        horasEspecial: periodo.horasEspecial,
+        horasEstudiante: periodo.horasEstudiante,
+        horasTutoria: periodo.horasTutoria,
+        horasAsistenteRes: periodo.horasAsistenteRes,
+        horasEspecialRes: periodo.horasEspecialRes,
+        horasEstudianteRes: periodo.horasEstudianteRes,
+        horasTutoriaRes: periodo.horasTutoriaRes,
+        estado: false,
+        fecha: serverTimestamp()
+      });
+    } else {
+      setDataForm({
+        id: periodo.id,
+        year: periodo.year,
+        semestre: periodo.semestre,
+        horasAsistente: periodo.horasAsistente,
+        horasEspecial: periodo.horasEspecial,
+        horasEstudiante: periodo.horasEstudiante,
+        horasTutoria: periodo.horasTutoria,
+        horasAsistenteRes: periodo.horasAsistenteRes,
+        horasEspecialRes: periodo.horasEspecialRes,
+        horasEstudianteRes: periodo.horasEstudianteRes,
+        horasTutoriaRes: periodo.horasTutoriaRes,
+        estado: true,
+        fecha: serverTimestamp()
+      });
+    }
+    setShowModalActivacion(true);
+  };
+
+  const handleConfirmActivacion = () => {
+    activacionPeriodo();
+    setShowModalActivacion(false);
+  };
 
   //Confirm update
   const handleUpdateClick = (e) => {
@@ -102,6 +175,11 @@ const Periodos = () => {
         horasEspecial: "",
         horasEstudiante: "",
         horasTutoria: "",
+        horasAsistenteRes: "",
+        horasEspecialRes: "",
+        horasEstudianteRes: "",
+        horasTutoriaRes: "",
+        estado: "",
         fecha: ""
       });
 
@@ -117,7 +195,12 @@ const Periodos = () => {
         horasEspecial: periodo.horasEspecial,
         horasEstudiante: periodo.horasEstudiante,
         horasTutoria: periodo.horasTutoria,
-        fecha: periodo.fecha
+        horasAsistenteRes: periodo.horasAsistenteRes,
+        horasEspecialRes: periodo.horasEspecialRes,
+        horasEstudianteRes: periodo.horasEstudianteRes,
+        horasTutoriaRes: periodo.horasTutoriaRes,
+        estado: periodo.estado,
+        fecha: periodo.fecha,
       });
     }
     setShowModal(true);
@@ -148,6 +231,11 @@ const Periodos = () => {
       horasEspecial,
       horasEstudiante,
       horasTutoria,
+      horasAsistenteRes: horasAsistente,
+      horasEspecialRes: horasEspecial,
+      horasEstudianteRes: horasEstudiante,
+      horasTutoriaRes: horasTutoria,
+      estado: false,
       fecha: serverTimestamp()
     };
 
@@ -161,9 +249,60 @@ const Periodos = () => {
     }
   };
 
+  //Activacion periodo
+  const activacionPeriodo = async () => {
+    const q = query(collection(db, "periodos"), where("id", "==", id));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      updateDoc(doc.ref, dataForm)
+        .then(() => {
+          toast.success("Estado del periodo cambiado exitosamente.");
+        })
+        .catch((error) => {
+          toast.error("Ha ocurrido un error.");
+        });
+    });
+    const listaPeriodosActualizada = periodos.map((periodo) =>
+      periodo.id === id ? { id: id, ...dataForm } : periodo
+    );
+    if (infoActivacion.existeActivo) {
+      setInfoActivacion({
+        existeActivo: false,
+        title: "Confirmar activación",
+        body: "¿Estás seguro que quieres activar este periodo?"
+      })
+
+    } else {
+      setInfoActivacion({
+        existeActivo: true,
+        title: "Confirmar desactivación",
+        body: "¿Estás seguro que quieres desactivar este periodo?"
+      })
+    }
+    setPeriodos(listaPeriodosActualizada);
+  };
+
+  //Editar periodo
   const editarPeriodo = async (e) => {
     e.preventDefault();
-    const periodoActualizado = { year, semestre, horasAsistente, horasEspecial, horasEstudiante, horasTutoria, fecha };
+
+    const periodoAnterior = periodos.find((periodo) => periodo.id === id);
+
+    const periodoActualizado = {
+      year,
+      semestre,
+      horasAsistente,
+      horasEspecial,
+      horasEstudiante,
+      horasTutoria,
+      horasAsistenteRes: parseInt(horasAsistenteRes) - parseInt(periodoAnterior.horasAsistente) + parseInt(horasAsistente),
+      horasEspecialRes: parseInt(horasEspecialRes) - parseInt(periodoAnterior.horasEspecial) + parseInt(horasEspecial),
+      horasEstudianteRes: parseInt(horasEstudianteRes) - parseInt(periodoAnterior.horasEstudiante) + parseInt(horasEstudiante),
+      horasTutoriaRes: parseInt(horasTutoriaRes) - parseInt(periodoAnterior.horasTutoria) + parseInt(horasTutoria),
+      estado,
+      fecha: serverTimestamp()
+    };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
 
@@ -336,6 +475,7 @@ const Periodos = () => {
             <th>Horas Especial</th>
             <th>Horas Estudiante</th>
             <th>Horas Tutoría</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -344,26 +484,72 @@ const Periodos = () => {
             <tr key={periodo.id}>
               <td>{periodo.year}</td>
               <td>{periodo.semestre}</td>
-              <td>{periodo.horasAsistente}</td>
-              <td>{periodo.horasEspecial}</td>
-              <td>{periodo.horasEstudiante}</td>
-              <td>{periodo.horasTutoria}</td>
-              <td>
-                <Button
-                  className="px-2 py-1 mx-1 fs-5"
-                  variant="warning"
-                  onClick={() => abrirModal("editar", periodo.id)}
-                >
-                  <MdEdit />
-                </Button>
-                <Button
-                  className="px-2 py-1 mx-1 fs-5"
-                  variant="danger"
-                  onClick={() => handleDeleteClick(periodo.id)}
-                >
-                  <MdDelete />
-                </Button>
-              </td>
+              <td>{periodo.horasAsistenteRes}/{periodo.horasAsistente}</td>
+              <td>{periodo.horasEspecialRes}/{periodo.horasEspecial}</td>
+              <td>{periodo.horasEstudianteRes}/{periodo.horasEstudiante}</td>
+              <td>{periodo.horasTutoriaRes}/{periodo.horasTutoria}</td>
+              {periodo.estado ? (
+                <td>Activo</td>
+              ) : (
+                <td>Inactivo</td>
+              )}
+              {infoActivacion.existeActivo && (
+                <td>
+                  {periodo.estado && (
+                    <Button
+                      className="px-2 py-1 mx-1 fs-5"
+                      variant="danger"
+                      onClick={() => handleActivacionClick(periodo.id)}
+                    >
+                      <MdCancel />
+                    </Button>
+                  )}
+                  {!periodo.estado && (
+                    <div>
+                      <Button
+                        className="px-2 py-1 mx-1 fs-5"
+                        variant="warning"
+                        onClick={() => abrirModal("editar", periodo.id)}
+                      >
+                        <MdEdit />
+                      </Button>
+                      <Button
+                        className="px-2 py-1 mx-1 fs-5"
+                        variant="danger"
+                        onClick={() => handleDeleteClick(periodo.id)}
+                      >
+                        <MdDelete />
+                      </Button>
+                    </div>
+                  )}
+                </td>
+              )}
+              {!infoActivacion.existeActivo && (
+                <td>
+                  <Button
+                    className="px-2 py-1 mx-1 fs-5"
+                    variant="warning"
+                    onClick={() => abrirModal("editar", periodo.id)}
+                  >
+                    <MdEdit />
+                  </Button>
+                  <Button
+                    className="px-2 py-1 mx-1 fs-5"
+                    variant="danger"
+                    onClick={() => handleDeleteClick(periodo.id)}
+                  >
+                    <MdDelete />
+                  </Button>
+
+                  <Button
+                    className="px-2 py-1 mx-1 fs-5"
+                    variant="success"
+                    onClick={() => handleActivacionClick(periodo.id)}
+                  >
+                    <MdCheckBox />
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -390,6 +576,29 @@ const Periodos = () => {
       </Pagination>
 
       <Modal
+        show={showModalActivacion}
+        onHide={() => setShowModalActivacion(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{infoActivacion.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {infoActivacion.body}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModalActivacion(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="success" onClick={handleConfirmActivacion}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
         show={showModalEliminar}
         onHide={() => setShowModalEliminar(false)}
       >
@@ -397,7 +606,7 @@ const Periodos = () => {
           <Modal.Title>Confirmar eliminación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro de que quieres eliminar este periodo?
+          ¿Estás seguro que quieres eliminar este periodo?
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -420,7 +629,7 @@ const Periodos = () => {
           <Modal.Title>Confirmar edición</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          ¿Estás seguro de que quieres editar este periodo?
+          ¿Estás seguro que quieres editar este periodo?
         </Modal.Body>
         <Modal.Footer>
           <Button

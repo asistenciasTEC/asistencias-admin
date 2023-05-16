@@ -14,6 +14,7 @@ const Gestion = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [dataForm, setDataForm] = useState({
     id: "",
+    idPeriodo: "",
     tipoAsistencia: "",
     cedula: "",
     carne: "",
@@ -25,6 +26,7 @@ const Gestion = () => {
     semestresActivo: "",
     correo: "",
     telefono: "",
+    tipoBanco: "",
     cuentaBancaria: "",
     cuentaIBAN: "",
     profesorAsistir: "",
@@ -36,6 +38,8 @@ const Gestion = () => {
     horasAsignadas: "",
     fecha: ""
   });
+
+  const [periodoActivo, setPeriodoActivo] = useState({});
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -84,6 +88,18 @@ const Gestion = () => {
       setSolicitudes(listaSolicitudes);
     };
     obtenerSolicitudes();
+
+    const obtenerPeriodo = async () => {
+      const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshot = await getDocs(queryPeriodo);
+      if (!querySnapshot.empty) {
+        const documento = querySnapshot.docs[0];
+        setPeriodoActivo(documento.data())
+      } else {
+        console.log("Eror: No hay periodo activo");
+      }
+    };
+    obtenerPeriodo()
   }, []);
 
   const abrirModal = (id) => {
@@ -122,7 +138,7 @@ const Gestion = () => {
 
   const aceptarGestion = async (e) => {
     e.preventDefault();
-    if (horasAsignadas !== "0") {
+    if (parseInt(horasAsignadas) > 0) {
       const solicitudActualizada = {
         id,
         tipoAsistencia,
@@ -147,10 +163,42 @@ const Gestion = () => {
         horasAsignadas,
         fecha
       };
-      const q = query(collection(db, "solicitudes"), where("id", "==", id));
-      const querySnapshot = await getDocs(q);
 
-      querySnapshot.forEach((doc) => {
+      const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
+
+      const periodoActualizado = {
+        id: periodoActivo.id,
+        year: periodoActivo.year,
+        semestre: periodoActivo.semestre,
+        horasAsistente: periodoActivo.horasAsistente,
+        horasEspecial: periodoActivo.horasEspecial,
+        horasEstudiante: periodoActivo.horasEstudiante,
+        horasTutoria: periodoActivo.horasTutoria,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteAux: periodoActivo.horasAsistenteAux,
+        horasEspecialAux: periodoActivo.horasEspecialAux,
+        horasEstudianteAux: periodoActivo.horasEstudianteAux,
+        horasTutoriaAux: periodoActivo.horasTutoriaAux,
+        estado: periodoActivo.estado,
+        fecha: periodoActivo.fecha
+      };
+
+      const queryPeri = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshotPeri = await getDocs(queryPeri);
+
+      querySnapshotPeri.forEach((doc) => {
+        updateDoc(doc.ref, periodoActualizado)
+      });
+
+      setPeriodoActivo(periodoActualizado)
+
+      const querySoli = query(collection(db, "solicitudes"), where("id", "==", id));
+      const querySnapshotSoli = await getDocs(querySoli);
+
+      querySnapshotSoli.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
             toast.success("Solicitud aceptada exitosamente.");
@@ -164,18 +212,15 @@ const Gestion = () => {
       );
       setSolicitudes(listaSolicitudesActualizada);
       cerrarModal();
-
     } else {
-      cerrarModal();
-      toast.error("Ha ocurrido un error al aceptar.");
+      toast.error("No se puede aceptar sin asignar horas");
     }
   };
 
-  const gestionSolicitud = async (e) => {
+  const rechazarGestion = async (e) => {
     e.preventDefault();
-    if (horasAsignadas !== "0") {
-      cerrarModal();
-      toast.error("Ha ocurrido un error al rechazar.");
+    if (parseInt(horasAsignadas) > 0) {
+      toast.error("No se puede rechazar si hay horas asignadas");
     } else {
       const solicitudActualizada = {
         id,
@@ -201,6 +246,38 @@ const Gestion = () => {
         horasAsignadas,
         fecha
       };
+
+      const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
+
+      const periodoActualizado = {
+        id: periodoActivo.id,
+        year: periodoActivo.year,
+        semestre: periodoActivo.semestre,
+        horasAsistente: periodoActivo.horasAsistente,
+        horasEspecial: periodoActivo.horasEspecial,
+        horasEstudiante: periodoActivo.horasEstudiante,
+        horasTutoria: periodoActivo.horasTutoria,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteAux: periodoActivo.horasAsistenteAux,
+        horasEspecialAux: periodoActivo.horasEspecialAux,
+        horasEstudianteAux: periodoActivo.horasEstudianteAux,
+        horasTutoriaAux: periodoActivo.horasTutoriaAux,
+        estado: periodoActivo.estado,
+        fecha: periodoActivo.fecha
+      };
+
+      const queryPeri = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshotPeri = await getDocs(queryPeri);
+
+      querySnapshotPeri.forEach((doc) => {
+        updateDoc(doc.ref, periodoActualizado)
+      });
+
+      setPeriodoActivo(periodoActualizado)
+
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
 
@@ -261,16 +338,14 @@ const Gestion = () => {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "carne") {
+    } else if (valorSeleccionado === "carne") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "nombre") {
+    } else if (valorSeleccionado === "nombre") {
       for (let i = 0; i < solicitudes.length; i++) {
 
         if (
@@ -282,40 +357,35 @@ const Gestion = () => {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "tipoAsistencia") {
+    } else if (valorSeleccionado === "tipoAsistencia") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "cursoAsistir") {
+    } else if (valorSeleccionado === "cursoAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "profesorAsistir") {
+    } else if (valorSeleccionado === "profesorAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "condicion") {
+    } else if (valorSeleccionado === "condicion") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "horasAsignadas") {
+    } else if (valorSeleccionado === "horasAsignadas") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].horasAsignadas.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
@@ -339,6 +409,12 @@ const Gestion = () => {
     <div className="container-lg ">
       <div className="containerToTitleAndExportToExcel">
         <h1>Gestión</h1>
+        <h5>
+          H.Asi: <span style={{ color: 'red' }}>{periodoActivo.horasAsistenteRes}</span> --
+          H.Esp: <span style={{ color: 'red' }}>{periodoActivo.horasEspecialRes}</span> --
+          H.Est: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
+          H.Tut: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
+        </h5>
         <div>
           <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
         </div>
@@ -430,7 +506,7 @@ const Gestion = () => {
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={gestionSolicitud}>
+          <Form id="form1">
             <Row>
               <Col>
                 <Form.Group className="mb-3" controlId="apellido1">
@@ -507,7 +583,6 @@ const Gestion = () => {
                     disabled
                   />
                 </Form.Group>
-
               </Col>
 
               <Col>
@@ -690,14 +765,13 @@ const Gestion = () => {
                 required
               />
             </Form.Group>
-
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={cerrarModal}>
             Cancelar
           </Button>{" "}
-          <Button id="botonRechazar" form="form1" variant="danger" type="submit">
+          <Button id="botonRechazar" form="form1" variant="danger" type="submit" onClick={rechazarGestion}>
             Rechazar
           </Button>{" "}
           <Button id="botonAceptar" form="form1" variant="success" type="submit" onClick={aceptarGestion}>
