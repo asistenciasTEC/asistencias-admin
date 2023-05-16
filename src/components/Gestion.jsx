@@ -39,13 +39,6 @@ const Gestion = () => {
     fecha: ""
   });
 
-  const [horasRestantes, setHorasRestantes] = useState({
-    horasAsistente: "",
-    horasEspecial: "",
-    horasEstudiante: "",
-    horasTutoria: ""
-  })
-
   const [periodoActivo, setPeriodoActivo] = useState("");
 
   const [showModal, setShowModal] = useState(false);
@@ -103,13 +96,7 @@ const Gestion = () => {
       const querySnapshot = await getDocs(queryPeriodo);
       if (!querySnapshot.empty) {
         const documento = querySnapshot.docs[0];
-        setPeriodoActivo(documento)
-        setHorasRestantes({
-          horasAsistente: periodoActivo.horasAsistente,
-          horasEspecial: periodoActivo.horasEspecial,
-          horasEstudiante: periodoActivo.horasEspecial,
-          horasTutoria: periodoActivo.horasEspecial
-        })
+        setPeriodoActivo(documento.data())
       } else {
         console.log("Eror: No hay periodo activo");
       }
@@ -371,10 +358,10 @@ const Gestion = () => {
       <div className="containerToTitleAndExportToExcel">
         <h1>Gestión</h1>
         <h5>
-          H.Asi: <span style={{ color: 'red' }}>{horasRestantes.horasAsistente}</span> --
-          H.Est: <span style={{ color: 'red' }}>{horasRestantes.horasEstudiante}</span> --
-          H.Esp: <span style={{ color: 'red' }}>{horasRestantes.horasEspecial}</span> --
-          H.Tut: <span style={{ color: 'red' }}>{horasRestantes.horasTutoria}</span>
+          H.Asi: <span style={{ color: 'red' }}>{periodoActivo.horasAsistenteRes}</span> --
+          H.Est: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
+          H.Esp: <span style={{ color: 'red' }}>{periodoActivo.horasEspecialRes}</span> --
+          H.Tut: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
         </h5>
         <div>
           <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
