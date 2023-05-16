@@ -39,7 +39,7 @@ const Gestion = () => {
     fecha: ""
   });
 
-  const [periodoActivo, setPeriodoActivo] = useState("");
+  const [periodoActivo, setPeriodoActivo] = useState({});
 
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -140,7 +140,7 @@ const Gestion = () => {
 
   const aceptarGestion = async (e) => {
     e.preventDefault();
-    if (horasAsignadas !== "0") {
+    if (parseInt(horasAsignadas) > 0) {
       const solicitudActualizada = {
         id,
         tipoAsistencia,
@@ -165,10 +165,40 @@ const Gestion = () => {
         horasAsignadas,
         fecha
       };
-      const q = query(collection(db, "solicitudes"), where("id", "==", id));
-      const querySnapshot = await getDocs(q);
 
-      querySnapshot.forEach((doc) => {
+      const periodoActualizado = {
+        id: periodoActivo.id,
+        year: periodoActivo.year,
+        semestre: periodoActivo.semestre,
+        horasAsistente: periodoActivo.horasAsistente,
+        horasEspecial: periodoActivo.horasEspecial,
+        horasEstudiante: periodoActivo.horasEstudiante,
+        horasTutoria: periodoActivo.horasTutoria,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteAux: periodoActivo.horasAsistenteAux,
+        horasEspecialAux: periodoActivo.horasEspecialAux,
+        horasEstudianteAux: periodoActivo.horasEstudianteAux,
+        horasTutoriaAux: periodoActivo.horasTutoriaAux,
+        estado: periodoActivo.estado,
+        fecha: periodoActivo.fecha
+      };
+
+      const queryPeri = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshotPeri = await getDocs(queryPeri);
+
+      querySnapshotPeri.forEach((doc) => {
+        updateDoc(doc.ref, periodoActualizado)
+      });
+
+      setPeriodoActivo(periodoActualizado)
+
+      const querySoli = query(collection(db, "solicitudes"), where("id", "==", id));
+      const querySnapshotSoli = await getDocs(querySoli);
+
+      querySnapshotSoli.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
             toast.success("Solicitud aceptada exitosamente.");
@@ -182,18 +212,15 @@ const Gestion = () => {
       );
       setSolicitudes(listaSolicitudesActualizada);
       cerrarModal();
-
     } else {
-      cerrarModal();
-      toast.error("Ha ocurrido un error al aceptar.");
+      toast.error("No se puede aceptar sin asignar horas");
     }
   };
 
-  const gestionSolicitud = async (e) => {
+  const rechazarGestion = async (e) => {
     e.preventDefault();
-    if (horasAsignadas !== "0") {
-      cerrarModal();
-      toast.error("Ha ocurrido un error al rechazar.");
+    if (parseInt(horasAsignadas) > 0) {
+      toast.error("No se puede rechazar si hay horas asignadas");
     } else {
       const solicitudActualizada = {
         id,
@@ -219,6 +246,38 @@ const Gestion = () => {
         horasAsignadas,
         fecha
       };
+
+      const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
+
+      const periodoActualizado = {
+        id: periodoActivo.id,
+        year: periodoActivo.year,
+        semestre: periodoActivo.semestre,
+        horasAsistente: periodoActivo.horasAsistente,
+        horasEspecial: periodoActivo.horasEspecial,
+        horasEstudiante: periodoActivo.horasEstudiante,
+        horasTutoria: periodoActivo.horasTutoria,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteAux: periodoActivo.horasAsistenteAux,
+        horasEspecialAux: periodoActivo.horasEspecialAux,
+        horasEstudianteAux: periodoActivo.horasEstudianteAux,
+        horasTutoriaAux: periodoActivo.horasTutoriaAux,
+        estado: periodoActivo.estado,
+        fecha: periodoActivo.fecha
+      };
+
+      const queryPeri = query(collection(db, "periodos"), where("estado", "==", true));
+      const querySnapshotPeri = await getDocs(queryPeri);
+
+      querySnapshotPeri.forEach((doc) => {
+        updateDoc(doc.ref, periodoActualizado)
+      });
+
+      setPeriodoActivo(periodoActualizado)
+
       const q = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
 
@@ -359,8 +418,8 @@ const Gestion = () => {
         <h1>Gestión</h1>
         <h5>
           H.Asi: <span style={{ color: 'red' }}>{periodoActivo.horasAsistenteRes}</span> --
-          H.Est: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
           H.Esp: <span style={{ color: 'red' }}>{periodoActivo.horasEspecialRes}</span> --
+          H.Est: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
           H.Tut: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
         </h5>
         <div>
@@ -454,7 +513,7 @@ const Gestion = () => {
           <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form id="form1" onSubmit={gestionSolicitud}>
+          <Form id="form1">
             <Row>
               <Col>
                 <Form.Group className="mb-3" controlId="apellido1">
@@ -531,7 +590,6 @@ const Gestion = () => {
                     disabled
                   />
                 </Form.Group>
-
               </Col>
 
               <Col>
@@ -714,14 +772,13 @@ const Gestion = () => {
                 required
               />
             </Form.Group>
-
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={cerrarModal}>
             Cancelar
           </Button>{" "}
-          <Button id="botonRechazar" form="form1" variant="danger" type="submit">
+          <Button id="botonRechazar" form="form1" variant="danger" type="submit" onClick={rechazarGestion}>
             Rechazar
           </Button>{" "}
           <Button id="botonAceptar" form="form1" variant="success" type="submit" onClick={aceptarGestion}>
