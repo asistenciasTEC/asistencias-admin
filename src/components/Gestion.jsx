@@ -48,7 +48,6 @@ const Gestion = () => {
 
   const {
     id,
-    idPeriodo,
     tipoAsistencia,
     cedula,
     carne,
@@ -60,7 +59,6 @@ const Gestion = () => {
     semestresActivo,
     correo,
     telefono,
-    tipoBanco,
     cuentaBancaria,
     cuentaIBAN,
     profesorAsistir,
@@ -166,6 +164,8 @@ const Gestion = () => {
         fecha
       };
 
+      const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
+
       const periodoActualizado = {
         id: periodoActivo.id,
         year: periodoActivo.year,
@@ -174,10 +174,10 @@ const Gestion = () => {
         horasEspecial: periodoActivo.horasEspecial,
         horasEstudiante: periodoActivo.horasEstudiante,
         horasTutoria: periodoActivo.horasTutoria,
-        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) : periodoActivo.horasAsistenteRes,
-        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) : periodoActivo.horasEspecialRes,
-        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) : periodoActivo.horasEstudianteRes,
-        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
         horasAsistenteAux: periodoActivo.horasAsistenteAux,
         horasEspecialAux: periodoActivo.horasEspecialAux,
         horasEstudianteAux: periodoActivo.horasEstudianteAux,
@@ -338,16 +338,14 @@ const Gestion = () => {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "carne") {
+    } else if (valorSeleccionado === "carne") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].carne.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "nombre") {
+    } else if (valorSeleccionado === "nombre") {
       for (let i = 0; i < solicitudes.length; i++) {
 
         if (
@@ -359,40 +357,35 @@ const Gestion = () => {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "tipoAsistencia") {
+    } else if (valorSeleccionado === "tipoAsistencia") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].tipoAsistencia.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "cursoAsistir") {
+    } else if (valorSeleccionado === "cursoAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].cursoAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "profesorAsistir") {
+    } else if (valorSeleccionado === "profesorAsistir") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].profesorAsistir.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "condicion") {
+    } else if (valorSeleccionado === "condicion") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].condicion.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(solicitudes[i]);
         }
       }
-    }
-    if (valorSeleccionado === "horasAsignadas") {
+    } else if (valorSeleccionado === "horasAsignadas") {
       for (let i = 0; i < solicitudes.length; i++) {
         if (solicitudes[i].horasAsignadas.toLowerCase() === terminoBusqueda.toLowerCase()
         ) {

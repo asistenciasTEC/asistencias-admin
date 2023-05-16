@@ -24,10 +24,6 @@ const Periodos = () => {
     horasEspecialRes: "",
     horasEstudianteRes: "",
     horasTutoriaRes: "",
-    horasAsistenteAux: "",
-    horasEspecialAux: "",
-    horasEstudianteAux: "",
-    horasTutoriaAux: "",
     estado: "",
     fecha: ""
   });
@@ -59,10 +55,6 @@ const Periodos = () => {
     horasEspecialRes,
     horasEstudianteRes,
     horasTutoriaRes,
-    horasAsistenteAux,
-    horasEspecialAux,
-    horasEstudianteAux,
-    horasTutoriaAux,
     estado,
   } = dataForm;
 
@@ -118,10 +110,6 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
-        horasAsistenteAux: periodo.horasAsistenteAux,
-        horasEspecialAux: periodo.horasEspecialAux,
-        horasEstudianteAux: periodo.horasEstudianteAux,
-        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: false,
         fecha: serverTimestamp()
       });
@@ -138,10 +126,6 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
-        horasAsistenteAux: periodo.horasAsistenteAux,
-        horasEspecialAux: periodo.horasEspecialAux,
-        horasEstudianteAux: periodo.horasEstudianteAux,
-        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: true,
         fecha: serverTimestamp()
       });
@@ -195,10 +179,6 @@ const Periodos = () => {
         horasEspecialRes: "",
         horasEstudianteRes: "",
         horasTutoriaRes: "",
-        horasAsistenteAux: "",
-        horasEspecialAux: "",
-        horasEstudianteAux: "",
-        horasTutoriaAux: "",
         estado: "",
         fecha: ""
       });
@@ -219,10 +199,6 @@ const Periodos = () => {
         horasEspecialRes: periodo.horasEspecialRes,
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
-        horasAsistenteAux: periodo.horasAsistenteAux,
-        horasEspecialAux: periodo.horasEspecialAux,
-        horasEstudianteAux: periodo.horasEstudianteAux,
-        horasTutoriaAux: periodo.horasTutoriaAux,
         estado: periodo.estado,
         fecha: periodo.fecha,
       });
@@ -259,10 +235,6 @@ const Periodos = () => {
       horasEspecialRes: horasEspecial,
       horasEstudianteRes: horasEstudiante,
       horasTutoriaRes: horasTutoria,
-      horasAsistenteAux: horasAsistente,
-      horasEspecialAux: horasEspecial,
-      horasEstudianteAux: horasEstudiante,
-      horasTutoriaAux: horasTutoria,
       estado: false,
       fecha: serverTimestamp()
     };
@@ -314,6 +286,9 @@ const Periodos = () => {
   //Editar periodo
   const editarPeriodo = async (e) => {
     e.preventDefault();
+
+    const periodoAnterior = periodos.find((periodo) => periodo.id === id);
+
     const periodoActualizado = {
       year,
       semestre,
@@ -321,14 +296,10 @@ const Periodos = () => {
       horasEspecial,
       horasEstudiante,
       horasTutoria,
-      horasAsistenteRes: parseInt(horasAsistenteRes) - parseInt(horasAsistenteAux) + parseInt(horasAsistente),
-      horasEspecialRes: parseInt(horasEspecialRes) - parseInt(horasEspecialAux) + parseInt(horasEspecial),
-      horasEstudianteRes: parseInt(horasEstudianteRes) - parseInt(horasEstudianteAux) + parseInt(horasEstudiante),
-      horasTutoriaRes: parseInt(horasTutoriaRes) - parseInt(horasTutoriaAux) + parseInt(horasTutoria),
-      horasAsistenteAux: horasAsistente,
-      horasEspecialAux: horasEspecial,
-      horasEstudianteAux: horasEstudiante,
-      horasTutoriaAux: horasTutoria,
+      horasAsistenteRes: parseInt(horasAsistenteRes) - parseInt(periodoAnterior.horasAsistente) + parseInt(horasAsistente),
+      horasEspecialRes: parseInt(horasEspecialRes) - parseInt(periodoAnterior.horasEspecial) + parseInt(horasEspecial),
+      horasEstudianteRes: parseInt(horasEstudianteRes) - parseInt(periodoAnterior.horasEstudiante) + parseInt(horasEstudiante),
+      horasTutoriaRes: parseInt(horasTutoriaRes) - parseInt(periodoAnterior.horasTutoria) + parseInt(horasTutoria),
       estado,
       fecha: serverTimestamp()
     };
