@@ -223,10 +223,6 @@ const Gestion = () => {
         horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
         horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
         horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
-        horasAsistenteAux: periodoActivo.horasAsistenteAux,
-        horasEspecialAux: periodoActivo.horasEspecialAux,
-        horasEstudianteAux: periodoActivo.horasEstudianteAux,
-        horasTutoriaAux: periodoActivo.horasTutoriaAux,
         estado: periodoActivo.estado,
         fecha: periodoActivo.fecha
       };
@@ -303,14 +299,10 @@ const Gestion = () => {
         horasEspecial: periodoActivo.horasEspecial,
         horasEstudiante: periodoActivo.horasEstudiante,
         horasTutoria: periodoActivo.horasTutoria,
-        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
-        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
-        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
-        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
-        horasAsistenteAux: periodoActivo.horasAsistenteAux,
-        horasEspecialAux: periodoActivo.horasEspecialAux,
-        horasEstudianteAux: periodoActivo.horasEstudianteAux,
-        horasTutoriaAux: periodoActivo.horasTutoriaAux,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
         estado: periodoActivo.estado,
         fecha: periodoActivo.fecha
       };
@@ -463,10 +455,10 @@ const Gestion = () => {
       <div className="containerToTitleAndExportToExcel">
         <h1>Gestión</h1>
         <h5>
-          H.Asi: <span style={{ color: 'red' }}>{periodoActivo.horasAsistenteRes}</span> --
-          H.Esp: <span style={{ color: 'red' }}>{periodoActivo.horasEspecialRes}</span> --
-          H.Est: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
-          H.Tut: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
+          H.A: <span style={{ color: 'red' }}>{periodoActivo.horasAsistenteRes}</span> --
+          A.E: <span style={{ color: 'red' }}>{periodoActivo.horasEspecialRes}</span> --
+          H.E: <span style={{ color: 'red' }}>{periodoActivo.horasEstudianteRes}</span> --
+          H.T: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
         </h5>
         <div>
           <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
