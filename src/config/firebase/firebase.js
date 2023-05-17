@@ -5,15 +5,15 @@
  // TODO: Add SDKs for Firebase products that you want to use
  // https://firebase.google.com/docs/web/setup#available-libraries
  
- // Your web app's Firebase configuration
- const firebaseConfig = {
-    apiKey: "AIzaSyAGb9zQ0_yNc3eei1peBjRNFxcRB2EjR4A",
-    authDomain: "test-1c827.firebaseapp.com",
-    projectId: "test-1c827",
-    storageBucket: "test-1c827.appspot.com",
-    messagingSenderId: "101859958556",
-    appId: "1:101859958556:web:a1c23f39c7a8ad6a5064d9"
-  };
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAob237DEjFS2alY2-dGY-tW3qzWraX_mE",
+  authDomain: "test2-56949.firebaseapp.com",
+  projectId: "test2-56949",
+  storageBucket: "test2-56949.appspot.com",
+  messagingSenderId: "237618785375",
+  appId: "1:237618785375:web:0fc92780e2bb3fc4ec3fea"
+};
 
  // Initialize Firebase
   const firebaseApp = initializeApp(firebaseConfig);
