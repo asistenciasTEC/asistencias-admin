@@ -166,6 +166,28 @@ const Gestion = () => {
 
       const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
 
+      if (tipoAsistencia === "Horas Asistente") {
+        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasAsistenteRes)) {
+          toast.error("No quedan suficientes horas restantes para Horas Asistente");
+          return null;
+        }
+      } else if (tipoAsistencia === "Asistencia Especial") {
+        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasEspecialRes)) {
+          toast.error("No quedan suficientes horas restantes para Asistencia Especial");
+          return null;
+        }
+      } else if (tipoAsistencia === "Horas Estudiantes") {
+        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasEstudianteRes)) {
+          toast.error("No quedan suficientes horas restantes para Horas Estudiantes");
+          return null;
+        }
+      } else if (tipoAsistencia === "Tutoria Estudiantil") {
+        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasTutoriaRes)) {
+          toast.error("No quedan suficientes horas restantes para Tutoria Estudiantil");
+          return null;
+        }
+      }
+
       const periodoActualizado = {
         id: periodoActivo.id,
         year: periodoActivo.year,
