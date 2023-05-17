@@ -26,7 +26,7 @@ const Gestion = () => {
     semestresActivo: "",
     correo: "",
     telefono: "",
-    tipoBanco: "",
+    tipoCuenta: "",
     cuentaBancaria: "",
     cuentaIBAN: "",
     profesorAsistir: "",
@@ -59,6 +59,7 @@ const Gestion = () => {
     semestresActivo,
     correo,
     telefono,
+    tipoCuenta,
     cuentaBancaria,
     cuentaIBAN,
     profesorAsistir,
@@ -135,6 +136,7 @@ const Gestion = () => {
       semestresActivo: solicitud.semestresActivo,
       correo: solicitud.correo,
       telefono: solicitud.telefono,
+      tipoCuenta: solicitud.tipoCuenta,
       cuentaBancaria: solicitud.cuentaBancaria,
       cuentaIBAN: solicitud.cuentaIBAN,
       profesorAsistir: solicitud.profesorAsistir,
@@ -172,6 +174,7 @@ const Gestion = () => {
         semestresActivo,
         correo,
         telefono,
+        tipoCuenta,
         cuentaBancaria,
         cuentaIBAN,
         profesorAsistir,
@@ -277,6 +280,7 @@ const Gestion = () => {
         semestresActivo,
         correo,
         telefono,
+        tipoCuenta,
         cuentaBancaria,
         cuentaIBAN,
         profesorAsistir,
@@ -582,12 +586,12 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="cuentaBancaria">
-                  <Form.Label>Cuenta Bancaria</Form.Label>
+                <Form.Group className="mb-3" controlId="banco">
+                  <Form.Label>Banco</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="N/A"
-                    value={cuentaBancaria}
+                    value={tipoCuenta}
                     onChange={handleChange}
                     autoComplete='off'
                     required
@@ -595,11 +599,24 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="tipoAsistencia">
-                  <Form.Label>Tipo de Asistencia</Form.Label>
+                <Form.Group className="mb-3" controlId="telefono">
+                  <Form.Label>Telefono</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={telefono}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="profesorAsistir">
+                  <Form.Label>Profesor a Asistir</Form.Label>
                   <Form.Control
                     type="text"
-                    value={tipoAsistencia}
+                    placeholder="N/A"
+                    value={profesorAsistir}
                     onChange={handleChange}
                     autoComplete='off'
                     required
@@ -620,18 +637,6 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="semestresActivo">
-                  <Form.Label>Cantidad de Semestres Activo</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="N/A"
-                    value={semestresActivo}
-                    onChange={handleChange}
-                    autoComplete='off'
-                    required
-                    disabled
-                  />
-                </Form.Group>
               </Col>
 
               <Col>
@@ -672,12 +677,11 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="profesorAsistir">
-                  <Form.Label>Profesor a Asistir</Form.Label>
+                <Form.Group className="mb-3" controlId="tipoAsistencia">
+                  <Form.Label>Tipo de Asistencia</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="N/A"
-                    value={profesorAsistir}
+                    value={tipoAsistencia}
                     onChange={handleChange}
                     autoComplete='off'
                     required
@@ -698,16 +702,17 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="boleta">
-                  <Form.Label>Boleta</Form.Label>
-                  <Button
-                    className="px-2 py-1 mb-2 fs-5"
-                    variant="success"
-                    onClick={handleDescargarBoleta}
-                  >
-                    Descargar Boleta
-                  </Button>
-
+                <Form.Group className="mb-3" controlId="semestresActivo">
+                  <Form.Label>Cantidad de Semestres Activo</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="N/A"
+                    value={semestresActivo}
+                    onChange={handleChange}
+                    autoComplete='off'
+                    required
+                    disabled
+                  />
                 </Form.Group>
               </Col>
 
@@ -736,17 +741,19 @@ const Gestion = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="telefono">
-                  <Form.Label>Telefono</Form.Label>
+                <Form.Group className="mb-3" controlId="cuentaBancaria">
+                  <Form.Label>Cuenta Bancaria</Form.Label>
                   <Form.Control
-                    type="number"
-                    value={telefono}
+                    type="text"
+                    placeholder="N/A"
+                    value={cuentaBancaria}
                     onChange={handleChange}
                     autoComplete='off'
                     required
                     disabled
                   />
                 </Form.Group>
+
 
                 <Form.Group className="mb-3" controlId="cursoAsistir">
                   <Form.Label>Curso a Asistir</Form.Label>
@@ -806,70 +813,82 @@ const Gestion = () => {
                     <tr>
                       <td>07:00 - 12:00</td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                     </tr>
                     <tr>
                       <td>12:00 - 17:00</td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                     </tr>
                     <tr>
                       <td>17:00 - 22:00</td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                       <td>
-                        <Form.Check type="checkbox" />
+                        <Form.Check disabled type="checkbox" />
                       </td>
                     </tr>
                   </tbody>
                 </Table>
               </Form.Group>
             )}
+
+            <Form.Group className="mb-3" controlId="boleta">
+              <Button
+                className="px-2 py-1 mb-2 fs-5"
+                variant="success"
+                onClick={handleDescargarBoleta}
+              >
+                Descargar Boleta
+              </Button>
+
+            </Form.Group>
+
             <Form.Group className="mb-3" controlId="horasAsignadas">
               <Form.Label>Horas Asignadas</Form.Label>
               <Form.Control
