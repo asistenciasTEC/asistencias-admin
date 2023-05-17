@@ -102,6 +102,23 @@ const Gestion = () => {
     obtenerPeriodo()
   }, []);
 
+  const cargarHorario = () => {
+    var filas = document.querySelectorAll("#horario tbody tr");
+    filas.forEach(function (fila, index) {
+      var celdas = fila.querySelectorAll("td");
+      var intervalo = celdas[0].textContent.trim();
+
+      // Recorre las celdas de los checkboxes y establece los valores según el horario
+      for (var i = 1; i < celdas.length; i++) {
+        var checkbox = celdas[i].querySelector("input[type='checkbox']");
+        var dia = Object.keys(horario)[i - 1];
+        if (horario[dia].includes(intervalo)) {
+          checkbox.checked = true;
+        }
+      }
+    })
+  };
+
   const abrirModal = (id) => {
     const solicitud = solicitudes.find((solicitud) => solicitud.id === id);
     setModalTitle("Informacion de la solicitud");
@@ -130,6 +147,9 @@ const Gestion = () => {
       fecha: solicitud.fecha
     });
     setShowModal(true);
+    if (tipoAsistencia === 'Horas Estudiantes') {
+      cargarHorario()
+    }
   };
 
   const cerrarModal = () => {
@@ -426,7 +446,14 @@ const Gestion = () => {
     setValorSeleccionado(event.target.value);
   }
   const solicitudesAceptadas = solicitudes.filter((objeto) => objeto.condicion === "Aceptado");
-  //Orden
+
+  const handleDescargarBoleta = () => {
+    window.open(
+      dataForm.boleta,
+      '_blank'
+    );
+  };
+
   return (
     <div className="container-lg ">
       <div className="containerToTitleAndExportToExcel">
@@ -673,15 +700,14 @@ const Gestion = () => {
 
                 <Form.Group className="mb-3" controlId="boleta">
                   <Form.Label>Boleta</Form.Label>
-                  <Form.Control
-                    type="jpg"
-                    placeholder="Aqui va a ir la boleta"
-                    value={boleta}
-                    onChange={handleChange}
-                    autoComplete='off'
-                    required
-                    disabled
-                  />
+                  <Button
+                    className="px-2 py-1 mb-2 fs-5"
+                    variant="success"
+                    onClick={handleDescargarBoleta}
+                  >
+                    Descargar Boleta
+                  </Button>
+
                 </Form.Group>
               </Col>
 
@@ -761,20 +787,89 @@ const Gestion = () => {
                 </Form.Group>
               </Col>
             </Row>
-
-            <Form.Group className="mb-3" controlId="horario">
-              <Form.Label>Horario</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Aqui va a ir el horario"
-                value={horario}
-                onChange={handleChange}
-                autoComplete='off'
-                required
-                disabled
-              />
-            </Form.Group>
-
+            {tipoAsistencia === 'Horas Estudiantes' && (
+              <Form.Group controlId="horario">
+                <Form.Label>Horario</Form.Label>
+                <Table bordered>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Lunes</th>
+                      <th>Martes</th>
+                      <th>Miércoles</th>
+                      <th>Jueves</th>
+                      <th>Viernes</th>
+                      <th>Sábado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>07:00 - 12:00</td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>12:00 - 17:00</td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>17:00 - 22:00</td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                      <td>
+                        <Form.Check type="checkbox" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Form.Group>
+            )}
             <Form.Group className="mb-3" controlId="horasAsignadas">
               <Form.Label>Horas Asignadas</Form.Label>
               <Form.Control
