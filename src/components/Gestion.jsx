@@ -103,21 +103,14 @@ const Gestion = () => {
     obtenerPeriodo()
   }, []);
 
-  const cargarHorario = () => {
-    var filas = document.querySelectorAll("#horario tbody tr");
-    filas.forEach(function (fila, index) {
-      var celdas = fila.querySelectorAll("td");
-      var intervalo = celdas[0].textContent.trim();
+  const marcarCasillasHorario = (horario) => {
+    const checkboxes = document.querySelectorAll("#horario input[type='checkbox']");
 
-      // Recorre las celdas de los checkboxes y establece los valores según el horario
-      for (var i = 1; i < celdas.length; i++) {
-        var checkbox = celdas[i].querySelector("input[type='checkbox']");
-        var dia = Object.keys(horario)[i - 1];
-        if (horario[dia].includes(intervalo)) {
-          checkbox.checked = true;
-        }
-      }
-    })
+    checkboxes.forEach((checkbox) => {
+      const [dia, intervalo] = checkbox.id.split("-");
+      const isChecked = horario[dia].includes(intervalo);
+      checkbox.checked = isChecked;
+    });
   };
 
   const abrirModal = (id) => {
@@ -150,7 +143,7 @@ const Gestion = () => {
     });
     setShowModal(true);
     if (tipoAsistencia === 'Horas Estudiantes') {
-      cargarHorario()
+      marcarCasillasHorario(solicitud.horario);
     }
   };
 
@@ -805,64 +798,136 @@ const Gestion = () => {
                     <tr>
                       <td>07:00 - 12:00</td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.lunes.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("lunes", "07:00 - 12:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.martes.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("martes", "07:00 - 12:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.miercoles.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("miercoles", "07:00 - 12:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.jueves.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("jueves", "07:00 - 12:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.viernes.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("viernes", "07:00 - 12:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.sabado.includes("07:00 - 12:00")}
+                          onChange={() => marcarCasillasHorario("sabado", "07:00 - 12:00")}
+                        />
                       </td>
                     </tr>
                     <tr>
                       <td>12:00 - 17:00</td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.lunes.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("lunes", "12:00 - 17:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.martes.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("martes", "12:00 - 17:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.miercoles.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("miercoles", "12:00 - 17:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.jueves.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("jueves", "12:00 - 17:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.viernes.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("viernes", "12:00 - 17:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.sabado.includes("12:00 - 17:00")}
+                          onChange={() => marcarCasillasHorario("sabado", "12:00 - 17:00")}
+                        />
                       </td>
                     </tr>
                     <tr>
                       <td>17:00 - 22:00</td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.lunes.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("lunes", "17:00 - 22:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.martes.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("martes", "17:00 - 22:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.miercoles.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("miercoles", "17:00 - 22:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.jueves.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("jueves", "17:00 - 22:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.viernes.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("viernes", "17:00 - 22:00")}
+                        />
                       </td>
                       <td>
-                        <Form.Check disabled type="checkbox" />
+                        <Form.Check
+                          type="checkbox"
+                          checked={horario.sabado.includes("17:00 - 22:00")}
+                          onChange={() => marcarCasillasHorario("sabado", "17:00 - 22:00")}
+                        />
                       </td>
                     </tr>
                   </tbody>
