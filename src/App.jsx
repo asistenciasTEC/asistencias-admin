@@ -12,6 +12,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AuthProvider from "./contexts/AuthContext";
 import NotFound from "./components/NotFound";
 import Usuario from './components/Usuario';
+import Footer from './components/footer';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             </Route>
             <Route exact path="*" element={<NotFound />} />
           </Routes>
+        <Footer/>
         </Router>
       </AuthProvider>
 
