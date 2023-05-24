@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { getAuth, updatePassword, signOut } from "firebase/auth";
+import { toast, ToastContainer } from "react-toastify";
 
 function Usuario() {
     const history = useNavigate();
@@ -70,6 +71,7 @@ function Usuario() {
                     </Col>
                 </Row>
             </Form>
+            <ToastContainer />
         </>
     )
 }
