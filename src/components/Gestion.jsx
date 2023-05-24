@@ -80,28 +80,31 @@ const Gestion = () => {
   }
 
   useEffect(() => {
-    const obtenerSolicitudes = async () => {
+    const obtenerDatos = async () => {
       const querySolicitudesCollection = query(collection(db, "solicitudes"), orderBy("fecha", "desc"));
-      const snapshot = await getDocs(querySolicitudesCollection);
-      const listaSolicitudes = snapshot.docs.map((doc) => ({
+      const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
+
+      const [snapshotSolicitudes, snapshotPeriodo] = await Promise.all([
+        getDocs(querySolicitudesCollection),
+        getDocs(queryPeriodo)
+      ]);
+
+      const listaSolicitudes = snapshotSolicitudes.docs.map((doc) => ({
         ...doc.data(),
       }));
       setSolicitudes(listaSolicitudes);
-    };
-    obtenerSolicitudes();
 
-    const obtenerPeriodo = async () => {
-      const queryPeriodo = query(collection(db, "periodos"), where("estado", "==", true));
-      const querySnapshot = await getDocs(queryPeriodo);
-      if (!querySnapshot.empty) {
-        const documento = querySnapshot.docs[0];
+      if (!snapshotPeriodo.empty) {
+        const documento = snapshotPeriodo.docs[0];
         setPeriodoActivo(documento.data())
       } else {
-        console.log("Eror: No hay periodo activo");
+        console.log("Error: No hay periodo activo");
       }
     };
-    obtenerPeriodo()
+
+    obtenerDatos();
   }, []);
+
 
   const marcarCasillasHorario = (horario) => {
     const checkboxes = document.querySelectorAll("#horario input[type='checkbox']");
@@ -151,6 +154,20 @@ const Gestion = () => {
     setShowModal(false);
   };
 
+  const verificarHorasRestantes = (tipoAsistencia, horasAsignadas, periodoActivo, solicitudAnterior) => {
+    const horasRestantes = tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) :
+      tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) :
+        tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) :
+          tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) :
+            0;
+
+    if (parseInt(horasAsignadas) > horasRestantes + parseInt(solicitudAnterior.horasAsignadas)) {
+      toast.error(`No quedan suficientes horas restantes para ${tipoAsistencia}`);
+      return false;
+    }
+    return true;
+  };
+
   const aceptarGestion = async (e) => {
     e.preventDefault();
     if (parseInt(horasAsignadas) > 0) {
@@ -182,26 +199,8 @@ const Gestion = () => {
 
       const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
 
-      if (tipoAsistencia === "Horas Asistente") {
-        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasAsistenteRes)) {
-          toast.error("No quedan suficientes horas restantes para Horas Asistente");
-          return null;
-        }
-      } else if (tipoAsistencia === "Asistencia Especial") {
-        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasEspecialRes)) {
-          toast.error("No quedan suficientes horas restantes para Asistencia Especial");
-          return null;
-        }
-      } else if (tipoAsistencia === "Horas Estudiantes") {
-        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasEstudianteRes)) {
-          toast.error("No quedan suficientes horas restantes para Horas Estudiantes");
-          return null;
-        }
-      } else if (tipoAsistencia === "Tutoria Estudiantil") {
-        if (parseInt(horasAsignadas) > parseInt(periodoActivo.horasTutoriaRes)) {
-          toast.error("No quedan suficientes horas restantes para Tutoria Estudiantil");
-          return null;
-        }
+      if (!verificarHorasRestantes(tipoAsistencia, horasAsignadas, periodoActivo, solicitudAnterior)) {
+        return null;
       }
 
       const periodoActualizado = {
@@ -224,10 +223,10 @@ const Gestion = () => {
       const querySnapshotPeri = await getDocs(queryPeri);
 
       querySnapshotPeri.forEach((doc) => {
-        updateDoc(doc.ref, periodoActualizado)
+        updateDoc(doc.ref, periodoActualizado);
       });
 
-      setPeriodoActivo(periodoActualizado)
+      setPeriodoActivo(periodoActualizado);
 
       const querySoli = query(collection(db, "solicitudes"), where("id", "==", id));
       const querySnapshotSoli = await getDocs(querySoli);
@@ -241,15 +240,15 @@ const Gestion = () => {
             toast.error("Ha ocurrido un error.");
           });
       });
+
       const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
         solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
       );
       setSolicitudes(listaSolicitudesActualizada);
       cerrarModal();
-    } else {
-      toast.error("No se puede aceptar sin asignar horas");
     }
   };
+
 
   const rechazarGestion = async (e) => {
     e.preventDefault();
@@ -278,9 +277,10 @@ const Gestion = () => {
         horario,
         boleta,
         condicion: "Rechazado",
-        horasAsignadas,
+        horasAsignadas: 0,
         fecha
       };
+
 
       const solicitudAnterior = solicitudes.find((solicitud) => solicitud.id === id);
 
@@ -292,10 +292,10 @@ const Gestion = () => {
         horasEspecial: periodoActivo.horasEspecial,
         horasEstudiante: periodoActivo.horasEstudiante,
         horasTutoria: periodoActivo.horasTutoria,
-        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
-        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
-        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
-        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasTutoriaRes,
         estado: periodoActivo.estado,
         fecha: periodoActivo.fecha
       };
@@ -304,15 +304,15 @@ const Gestion = () => {
       const querySnapshotPeri = await getDocs(queryPeri);
 
       querySnapshotPeri.forEach((doc) => {
-        updateDoc(doc.ref, periodoActualizado)
+        updateDoc(doc.ref, periodoActualizado);
       });
 
-      setPeriodoActivo(periodoActualizado)
+      setPeriodoActivo(periodoActualizado);
 
-      const q = query(collection(db, "solicitudes"), where("id", "==", id));
-      const querySnapshot = await getDocs(q);
+      const querySoli = query(collection(db, "solicitudes"), where("id", "==", id));
+      const querySnapshotSoli = await getDocs(querySoli);
 
-      querySnapshot.forEach((doc) => {
+      querySnapshotSoli.forEach((doc) => {
         updateDoc(doc.ref, solicitudActualizada)
           .then(() => {
             toast.success("Solicitud rechazada exitosamente.");
@@ -321,6 +321,7 @@ const Gestion = () => {
             toast.error("Ha ocurrido un error.");
           });
       });
+
       const listaSolicitudesActualizada = solicitudes.map((solicitud) =>
         solicitud.id === id ? { id: id, ...solicitudActualizada } : solicitud
       );
@@ -328,6 +329,8 @@ const Gestion = () => {
       cerrarModal();
     }
   };
+
+
 
   //Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -801,43 +804,37 @@ const Gestion = () => {
                         <Form.Check
                           type="checkbox"
                           checked={horario.lunes.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("lunes", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.martes.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("martes", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.miercoles.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("miercoles", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.jueves.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("jueves", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.viernes.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("viernes", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.sabado.includes("07:00 - 12:00")}
-                          onChange={() => marcarCasillasHorario("sabado", "07:00 - 12:00")}
-                        />
+                          disabled />
                       </td>
                     </tr>
                     <tr>
@@ -846,43 +843,37 @@ const Gestion = () => {
                         <Form.Check
                           type="checkbox"
                           checked={horario.lunes.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("lunes", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.martes.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("martes", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.miercoles.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("miercoles", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.jueves.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("jueves", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.viernes.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("viernes", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.sabado.includes("12:00 - 17:00")}
-                          onChange={() => marcarCasillasHorario("sabado", "12:00 - 17:00")}
-                        />
+                          disabled />
                       </td>
                     </tr>
                     <tr>
@@ -891,42 +882,39 @@ const Gestion = () => {
                         <Form.Check
                           type="checkbox"
                           checked={horario.lunes.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("lunes", "17:00 - 22:00")}
+                          disabled
                         />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.martes.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("martes", "17:00 - 22:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.miercoles.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("miercoles", "17:00 - 22:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.jueves.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("jueves", "17:00 - 22:00")}
-                        />
+                          disabled />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.viernes.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("viernes", "17:00 - 22:00")}
+                          disabled
                         />
                       </td>
                       <td>
                         <Form.Check
                           type="checkbox"
                           checked={horario.sabado.includes("17:00 - 22:00")}
-                          onChange={() => marcarCasillasHorario("sabado", "17:00 - 22:00")}
+                          disabled
                         />
                       </td>
                     </tr>
