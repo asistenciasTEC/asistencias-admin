@@ -17,11 +17,25 @@ function Usuario() {
     };
     const handleSubmitRegistro = async (e) => {
         e.preventDefault();
-
-        updatePassword(usuarioAuthentication, cambioContraseña.confirmacionContraseña).then(() => {
-            signOut(auth);
-            history("/login");
-        })
+        try {
+            if (cambioContraseña.nuevaContraseña !== cambioContraseña.confirmacionContraseña) {
+                toast.error("Las contraseñas no coinciden.");
+                return;
+            }
+            try {
+                await updatePassword(usuarioAuthentication, cambioContraseña.confirmacionContraseña);
+                signOut(auth);
+                history("/login");
+            } catch (error) {
+                if (error.code === "auth/requires-recent-login") {
+                    toast.error("Error al actualizar la contraseña. Por favor, vuelva a iniciar sesión e inténtelo de nuevo");
+                } else {
+                    throw error;
+                }
+            }
+        } catch (error) {
+            toast.error("Error al actualizar la contraseña. Por favor, vuelva a intentarlo más tarde.");
+        }
     }
 
     return (
