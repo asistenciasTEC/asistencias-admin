@@ -10,7 +10,10 @@ import { toast, ToastContainer } from "react-toastify";
 //librería de iconos boostrap para react
 import { MdAddBox, MdEdit, MdDelete, MdCheckBox, MdCancel } from "react-icons/md";
 
+import { getStorage, ref } from 'firebase/storage';
+
 const Periodos = () => {
+  const storage = getStorage();
   const [periodos, setPeriodos] = useState([]);
   const [dataForm, setDataForm] = useState({
     id: "",
@@ -322,9 +325,25 @@ const Periodos = () => {
   };
 
   const eliminarPeriodo = async (id) => {
+    try {
+      const qSoli = query(collection(db, "solicitudes"), where("idPeriodo", "==", id));
+      const querySnapshotSoli = await getDocs(qSoli);
+      querySnapshotSoli.forEach((doc) => {
+        deleteDoc(doc.ref)
+      });
+    } catch (error) {
+      console.error("Error al eliminar las solicitudes de este periodo", error);
+    }
+
+    try {
+      const carpetaBoletasRef = ref(storage, id);
+      await carpetaBoletasRef.delete();
+    } catch (error) {
+      console.error("Error al eliminar la carpeta de boletas de este periodo", error);
+    }
+
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
-
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
         .then(() => {

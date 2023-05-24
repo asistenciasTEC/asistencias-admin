@@ -46,6 +46,9 @@ const Gestion = () => {
   const [resultados, setResultados] = useState([]);
   const [valorSeleccionado, setValorSeleccionado] = useState("");
 
+  const [hayPeriodo, setHayPeriodo] = useState(false);
+
+
   const {
     id,
     tipoAsistencia,
@@ -97,6 +100,7 @@ const Gestion = () => {
       if (!snapshotPeriodo.empty) {
         const documento = snapshotPeriodo.docs[0];
         setPeriodoActivo(documento.data())
+        setHayPeriodo(true)
       } else {
         console.log("Error: No hay periodo activo");
       }
@@ -210,10 +214,10 @@ const Gestion = () => {
         horasEspecial: periodoActivo.horasEspecial,
         horasEstudiante: periodoActivo.horasEstudiante,
         horasTutoria: periodoActivo.horasTutoria,
-        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasAsistenteRes,
-        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEspecialRes,
-        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasEstudianteRes,
-        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + parseInt(solicitudAnterior.horasAsignadas) : periodoActivo.horasTutoriaRes,
+        horasAsistenteRes: tipoAsistencia === "Horas Asistente" ? parseInt(periodoActivo.horasAsistenteRes) - parseInt(horasAsignadas) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasAsistenteRes,
+        horasEspecialRes: tipoAsistencia === "Asistencia Especial" ? parseInt(periodoActivo.horasEspecialRes) - parseInt(horasAsignadas) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasEspecialRes,
+        horasEstudianteRes: tipoAsistencia === "Horas Estudiantes" ? parseInt(periodoActivo.horasEstudianteRes) - parseInt(horasAsignadas) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasEstudianteRes,
+        horasTutoriaRes: tipoAsistencia === "Tutoria Estudiantil" ? parseInt(periodoActivo.horasTutoriaRes) - parseInt(horasAsignadas) + (isNaN(parseInt(solicitudAnterior.horasAsignadas)) ? 0 : parseInt(solicitudAnterior.horasAsignadas)) : periodoActivo.horasTutoriaRes,
         estado: periodoActivo.estado,
         fecha: periodoActivo.fecha
       };
@@ -510,13 +514,24 @@ const Gestion = () => {
               <td>{solicitud.condicion}</td>
               <td>{solicitud.horasAsignadas}</td>
               <td>
-                <Button
-                  className="px-2 py-1 mx-1 fs-5"
-                  variant="info"
-                  onClick={() => abrirModal(solicitud.id)}
-                >
-                  <MdInfo />
-                </Button>
+                {hayPeriodo ? (
+                  <Button
+                    className="px-2 py-1 mx-1 fs-5"
+                    variant="info"
+                    onClick={() => abrirModal(solicitud.id)}
+                  >
+                    <MdInfo />
+                  </Button>
+                ) : (
+                  <Button
+                    className="px-2 py-1 mx-1 fs-5"
+                    variant="info"
+                    onClick={() => abrirModal(solicitud.id)}
+                    disabled
+                  >
+                    <MdInfo />
+                  </Button>
+                )}
               </td>
             </tr>
           ))}
