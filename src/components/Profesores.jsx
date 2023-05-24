@@ -114,17 +114,25 @@ function Profesores() {
     e.preventDefault();
     const nuevoProfesor = { id: uuid(), nombre, email, password };
     const nuevoProf = { id: nuevoProfesor.id, nombre: nuevoProfesor.nombre, email: nuevoProfesor.email.toLowerCase(), password: nuevoProfesor.password }
-    if (buscarProfesor(email) === null || profesores.length === 0) {
-      await addDoc(collection(db, "profesores"), nuevoProf);
-      setProfesores([nuevoProf, ...profesores,]);
-      await createUserWithEmailAndPassword(auth, nuevoProfesor.email, nuevoProfesor.password)
-      toast.success("Profesor agregado exitosamente.");
-
-      cerrarModal();
-    } else if (buscarProfesor(email) !== null) {
-      toast.error("El email a registrar ya existe");
+    try {
+      if (buscarProfesor(email) === null || profesores.length === 0) {
+        await addDoc(collection(db, "profesores"), nuevoProf);
+        setProfesores([nuevoProf, ...profesores,]);
+        await createUserWithEmailAndPassword(auth, nuevoProfesor.email, nuevoProfesor.password)
+        toast.success("Profesor agregado exitosamente.");
+        cerrarModal();
+      } else if (buscarProfesor(email) !== null) {
+        toast.error("El email a registrar ya existe");
+      }
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        toast.error("El email ya está en uso");
+      } else {
+        console.log("Error en Firebase:", error);
+      }
     }
   };
+
 
   const editarProfesor = async (e) => {
     e.preventDefault();
