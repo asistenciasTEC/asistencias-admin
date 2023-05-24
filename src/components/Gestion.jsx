@@ -101,7 +101,6 @@ const Gestion = () => {
         console.log("Error: No hay periodo activo");
       }
     };
-
     obtenerDatos();
   }, []);
 
@@ -246,6 +245,8 @@ const Gestion = () => {
       );
       setSolicitudes(listaSolicitudesActualizada);
       cerrarModal();
+    } else {
+      toast.error("No se puede aceptar sin asignar horas");
     }
   };
 
