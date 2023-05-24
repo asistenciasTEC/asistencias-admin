@@ -122,11 +122,11 @@ function Profesores() {
         toast.success("Profesor agregado exitosamente.");
         cerrarModal();
       } else if (buscarProfesor(email) !== null) {
-        toast.error("El email a registrar ya existe");
+        toast.error("El correo electrónico a registrar ya existe");
       }
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
-        toast.error("El email ya está en uso");
+        toast.error("El correo electrónico ya está en uso");
       } else {
         console.log("Error en Firebase:", error);
       }
@@ -266,7 +266,7 @@ function Profesores() {
         <thead className="table-dark table-bg-scale-50">
           <tr>
             <th>Nombre completo</th>
-            <th>Correo Electrónico</th>
+            <th>Correo electrónico</th>
             <th>Acciones</th>
           </tr>
         </thead>

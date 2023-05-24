@@ -1,5 +1,6 @@
 body {
     background-color: white;
+    overflow: hidden;
 }
 
 /* Navbar    */
@@ -55,10 +56,6 @@ body {
     height: 100vh;
 }
 
-/*   Login */
-body {
-    overflow: hidden;
-}
 
 .btn_restablecer {
     border: None;

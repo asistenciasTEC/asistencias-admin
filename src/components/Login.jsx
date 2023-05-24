@@ -39,7 +39,7 @@ const Login = () => {
             });
             history("/");
           } else {
-            throw new Error("El correo no tiene permisos para acceder");
+            throw new Error("El correo electrónico no tiene permisos para acceder");
           }
         } catch (error) {
           setData({ ...data, error: error.message, loading: false });
@@ -56,10 +56,10 @@ const Login = () => {
   const restablecerContraseña = async (e) => {
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        toast.success("Se envio un correo de restablecimiento de contraseña");
+        toast.success("Se envió un correo electrónico de restablecimiento de contraseña");
       })
       .catch((error) => {
-        toast.error("Tiene que añadir un correo en el espacio designado");
+        toast.error("Tiene que añadir un correo electrónico en el espacio designado");
       });
   };
   return (
@@ -93,7 +93,7 @@ const Login = () => {
         <div className="btn_container">
           <button href="/" type="button" className="btn_restablecer" onClick={() => {
             restablecerContraseña();
-          }}>¿Olvido su contraseña?</button >
+          }}>¿Olvidó su contraseña?</button >
         </div>
       </form>
       <ToastContainer />
