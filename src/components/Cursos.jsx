@@ -113,7 +113,7 @@ function Cursos() {
       cerrarModal();
     } else if (buscarcurso(codigo) !== null) {
 
-      toast.error("El codigo a registrar ya existe");
+      toast.error("El código a registrar ya existe");
     }
   };
 
@@ -397,7 +397,7 @@ function Cursos() {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="codigo">
-              <Form.Label>Codigo</Form.Label>
+              <Form.Label>Código</Form.Label>
               <Form.Control
                 type="codigo"
                 placeholder="Escribe el código del curso"
