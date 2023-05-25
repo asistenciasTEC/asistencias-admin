@@ -1,19 +1,32 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, serverTimestamp, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  serverTimestamp,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  orderBy,
+} from "firebase/firestore";
 import { Table, Modal, Form, Button, Pagination } from "react-bootstrap";
 import { db } from "../config/firebase/firebase";
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
 
 //librería de mensajes información
 import { toast, ToastContainer } from "react-toastify";
 
 //librería de iconos boostrap para react
-import { MdAddBox, MdEdit, MdDelete, MdCheckBox, MdCancel } from "react-icons/md";
-
-import { getStorage, ref } from 'firebase/storage';
+import {
+  MdAddBox,
+  MdEdit,
+  MdDelete,
+  MdCheckBox,
+  MdCancel,
+} from "react-icons/md";
 
 const Periodos = () => {
-  const storage = getStorage();
   const [periodos, setPeriodos] = useState([]);
   const [dataForm, setDataForm] = useState({
     id: "",
@@ -28,7 +41,7 @@ const Periodos = () => {
     horasEstudianteRes: "",
     horasTutoriaRes: "",
     estado: "",
-    fecha: ""
+    fecha: "",
   });
 
   const [showModalActivacion, setShowModalActivacion] = useState(false);
@@ -63,27 +76,32 @@ const Periodos = () => {
 
   useEffect(() => {
     const obtenerPeriodos = async () => {
-      const queryPeriodosCollection = query(collection(db, "periodos"), orderBy("fecha", "desc"));
+      const queryPeriodosCollection = query(
+        collection(db, "periodos"),
+        orderBy("fecha", "desc")
+      );
       const snapshot = await getDocs(queryPeriodosCollection);
       const listaPeriodos = snapshot.docs.map((doc) => ({
         ...doc.data(),
       }));
 
       // Verificar si existe algún periodo con estado en true
-      const algunPeriodoActivo = listaPeriodos.some((periodo) => periodo.estado);
+      const algunPeriodoActivo = listaPeriodos.some(
+        (periodo) => periodo.estado
+      );
       // Cambiar el estado basado en si existe algún periodo activo
       if (algunPeriodoActivo) {
         setInfoActivacion({
           existeActivo: true,
           title: "Confirmar desactivación",
-          body: "¿Estás seguro que quieres desactivar este periodo?"
-        })
+          body: "¿Estás seguro que quieres desactivar este periodo?",
+        });
       } else {
         setInfoActivacion({
           existeActivo: false,
           title: "Confirmar activación",
-          body: "¿Estás seguro que quieres activar este periodo?"
-        })
+          body: "¿Estás seguro que quieres activar este periodo?",
+        });
       }
       setPeriodos(listaPeriodos);
     };
@@ -93,9 +111,9 @@ const Periodos = () => {
   const handleChange = (e) => {
     setDataForm({
       ...dataForm,
-      [e.target.id]: e.target.value
-    })
-  }
+      [e.target.id]: e.target.value,
+    });
+  };
 
   //Activar/desactivar periodo
   const handleActivacionClick = (id) => {
@@ -114,7 +132,7 @@ const Periodos = () => {
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
         estado: false,
-        fecha: serverTimestamp()
+        fecha: serverTimestamp(),
       });
     } else {
       setDataForm({
@@ -130,7 +148,7 @@ const Periodos = () => {
         horasEstudianteRes: periodo.horasEstudianteRes,
         horasTutoriaRes: periodo.horasTutoriaRes,
         estado: true,
-        fecha: serverTimestamp()
+        fecha: serverTimestamp(),
       });
     }
     setShowModalActivacion(true);
@@ -183,9 +201,8 @@ const Periodos = () => {
         horasEstudianteRes: "",
         horasTutoriaRes: "",
         estado: "",
-        fecha: ""
+        fecha: "",
       });
-
     } else if (accion === "editar") {
       const periodo = periodos.find((periodo) => periodo.id === id);
       setModalTitle("Editar periodo");
@@ -239,7 +256,7 @@ const Periodos = () => {
       horasEstudianteRes: horasEstudiante,
       horasTutoriaRes: horasTutoria,
       estado: false,
-      fecha: serverTimestamp()
+      fecha: serverTimestamp(),
     };
 
     if (buscarPeriodo(year, semestre) === null || periodos.length === 0) {
@@ -273,15 +290,14 @@ const Periodos = () => {
       setInfoActivacion({
         existeActivo: false,
         title: "Confirmar activación",
-        body: "¿Estás seguro que quieres activar este periodo?"
-      })
-
+        body: "¿Estás seguro que quieres activar este periodo?",
+      });
     } else {
       setInfoActivacion({
         existeActivo: true,
         title: "Confirmar desactivación",
-        body: "¿Estás seguro que quieres desactivar este periodo?"
-      })
+        body: "¿Estás seguro que quieres desactivar este periodo?",
+      });
     }
     setPeriodos(listaPeriodosActualizada);
   };
@@ -299,12 +315,24 @@ const Periodos = () => {
       horasEspecial,
       horasEstudiante,
       horasTutoria,
-      horasAsistenteRes: parseInt(horasAsistenteRes) - parseInt(periodoAnterior.horasAsistente) + parseInt(horasAsistente),
-      horasEspecialRes: parseInt(horasEspecialRes) - parseInt(periodoAnterior.horasEspecial) + parseInt(horasEspecial),
-      horasEstudianteRes: parseInt(horasEstudianteRes) - parseInt(periodoAnterior.horasEstudiante) + parseInt(horasEstudiante),
-      horasTutoriaRes: parseInt(horasTutoriaRes) - parseInt(periodoAnterior.horasTutoria) + parseInt(horasTutoria),
+      horasAsistenteRes:
+        parseInt(horasAsistenteRes) -
+        parseInt(periodoAnterior.horasAsistente) +
+        parseInt(horasAsistente),
+      horasEspecialRes:
+        parseInt(horasEspecialRes) -
+        parseInt(periodoAnterior.horasEspecial) +
+        parseInt(horasEspecial),
+      horasEstudianteRes:
+        parseInt(horasEstudianteRes) -
+        parseInt(periodoAnterior.horasEstudiante) +
+        parseInt(horasEstudiante),
+      horasTutoriaRes:
+        parseInt(horasTutoriaRes) -
+        parseInt(periodoAnterior.horasTutoria) +
+        parseInt(horasTutoria),
       estado,
-      fecha: serverTimestamp()
+      fecha: serverTimestamp(),
     };
     const q = query(collection(db, "periodos"), where("id", "==", id));
     const querySnapshot = await getDocs(q);
@@ -326,20 +354,16 @@ const Periodos = () => {
 
   const eliminarPeriodo = async (id) => {
     try {
-      const qSoli = query(collection(db, "solicitudes"), where("idPeriodo", "==", id));
+      const qSoli = query(
+        collection(db, "solicitudes"),
+        where("idPeriodo", "==", id)
+      );
       const querySnapshotSoli = await getDocs(qSoli);
       querySnapshotSoli.forEach((doc) => {
-        deleteDoc(doc.ref)
+        deleteDoc(doc.ref);
       });
     } catch (error) {
       console.error("Error al eliminar las solicitudes de este periodo", error);
-    }
-
-    try {
-      const carpetaBoletasRef = ref(storage, id);
-      await carpetaBoletasRef.delete();
-    } catch (error) {
-      console.error("Error al eliminar la carpeta de boletas de este periodo", error);
     }
 
     const q = query(collection(db, "periodos"), where("id", "==", id));
@@ -353,7 +377,9 @@ const Periodos = () => {
           toast.error("Ha ocurrido un error.");
         });
     });
-    const listaPeriodosActualizada = periodos.filter((periodo) => periodo.id !== id);
+    const listaPeriodosActualizada = periodos.filter(
+      (periodo) => periodo.id !== id
+    );
     setPeriodos(listaPeriodosActualizada);
   };
 
@@ -377,19 +403,20 @@ const Periodos = () => {
 
   const buscarEnLista = (terminoBusqueda) => {
     const resultadosBusq = [];
-    if (
-      valorSeleccionado === "default" ||
-      valorSeleccionado === ""
-    ) {
+    if (valorSeleccionado === "default" || valorSeleccionado === "") {
       for (let i = 0; i < periodos.length; i++) {
         if (
           periodos[i].year.toLowerCase() === terminoBusqueda.toLowerCase() ||
-          periodos[i].semestre.toLowerCase() === terminoBusqueda.toLowerCase() ||
-          periodos[i].horasAsistente.toLowerCase() === terminoBusqueda.toLowerCase() ||
-          periodos[i].horasEspecial.toLowerCase() === terminoBusqueda.toLowerCase() ||
-          periodos[i].horasEstudiante.toLowerCase() === terminoBusqueda.toLowerCase() ||
-          periodos[i].horasTutoria.toLowerCase() === terminoBusqueda.toLowerCase()
-
+          periodos[i].semestre.toLowerCase() ===
+            terminoBusqueda.toLowerCase() ||
+          periodos[i].horasAsistente.toLowerCase() ===
+            terminoBusqueda.toLowerCase() ||
+          periodos[i].horasEspecial.toLowerCase() ===
+            terminoBusqueda.toLowerCase() ||
+          periodos[i].horasEstudiante.toLowerCase() ===
+            terminoBusqueda.toLowerCase() ||
+          periodos[i].horasTutoria.toLowerCase() ===
+            terminoBusqueda.toLowerCase()
         ) {
           resultadosBusq.push(periodos[i]);
         }
@@ -503,15 +530,19 @@ const Periodos = () => {
             <tr key={periodo.id}>
               <td>{periodo.year}</td>
               <td>{periodo.semestre}</td>
-              <td>{periodo.horasAsistenteRes}/{periodo.horasAsistente}</td>
-              <td>{periodo.horasEspecialRes}/{periodo.horasEspecial}</td>
-              <td>{periodo.horasEstudianteRes}/{periodo.horasEstudiante}</td>
-              <td>{periodo.horasTutoriaRes}/{periodo.horasTutoria}</td>
-              {periodo.estado ? (
-                <td>Activo</td>
-              ) : (
-                <td>Inactivo</td>
-              )}
+              <td>
+                {periodo.horasAsistenteRes}/{periodo.horasAsistente}
+              </td>
+              <td>
+                {periodo.horasEspecialRes}/{periodo.horasEspecial}
+              </td>
+              <td>
+                {periodo.horasEstudianteRes}/{periodo.horasEstudiante}
+              </td>
+              <td>
+                {periodo.horasTutoriaRes}/{periodo.horasTutoria}
+              </td>
+              {periodo.estado ? <td>Activo</td> : <td>Inactivo</td>}
               {infoActivacion.existeActivo && (
                 <td>
                   {periodo.estado && (
@@ -601,9 +632,7 @@ const Periodos = () => {
         <Modal.Header closeButton>
           <Modal.Title>{infoActivacion.title}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {infoActivacion.body}
-        </Modal.Body>
+        <Modal.Body>{infoActivacion.body}</Modal.Body>
         <Modal.Footer>
           <Button
             variant="secondary"
@@ -640,21 +669,13 @@ const Periodos = () => {
         </Modal.Footer>
       </Modal>
 
-      <Modal
-        show={showModalEditar}
-        onHide={() => setShowModalEditar(false)}
-      >
+      <Modal show={showModalEditar} onHide={() => setShowModalEditar(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar edición</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          ¿Estás seguro que quieres editar este periodo?
-        </Modal.Body>
+        <Modal.Body>¿Estás seguro que quieres editar este periodo?</Modal.Body>
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowModalEditar(false)}
-          >
+          <Button variant="secondary" onClick={() => setShowModalEditar(false)}>
             Cancelar
           </Button>
           <Button variant="success" onClick={handleConfirmUpdate}>
@@ -678,7 +699,7 @@ const Periodos = () => {
                 placeholder="Escribe el año del periodo"
                 value={year}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -692,7 +713,7 @@ const Periodos = () => {
                 placeholder="Escribe el semestre del periodo"
                 value={semestre}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -706,7 +727,7 @@ const Periodos = () => {
                 placeholder="Escribe la cantidad de horas asistente"
                 value={horasAsistente}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -720,7 +741,7 @@ const Periodos = () => {
                 placeholder="Escribe la cantidad de horas especial"
                 value={horasEspecial}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -734,7 +755,7 @@ const Periodos = () => {
                 placeholder="Escribe la cantidad de horas estudiante"
                 value={horasEstudiante}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -748,11 +769,10 @@ const Periodos = () => {
                 placeholder="Escribe la cantidad de horas tutoria"
                 value={horasTutoria}
                 onChange={handleChange}
-                autoComplete='off'
+                autoComplete="off"
                 required
               />
             </Form.Group>
-
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -767,6 +787,6 @@ const Periodos = () => {
       <ToastContainer />
     </div>
   );
-}
+};
 
-export default Periodos
+export default Periodos;
