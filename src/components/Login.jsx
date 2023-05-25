@@ -64,7 +64,7 @@ const Login = () => {
   };
   return (
     <section>
-      <h3>Inicio de Sesion</h3>
+      <h3>Inicio de Sesión</h3>
       <form className="form" onSubmit={handleSubmit}>
         <div className="input_container">
           <label htmlFor="email">Correo electrónico</label>
