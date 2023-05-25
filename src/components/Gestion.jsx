@@ -442,7 +442,6 @@ const Gestion = () => {
   function handleSelectChange(event) {
     setValorSeleccionado(event.target.value);
   }
-  const solicitudesAceptadas = solicitudes.filter((objeto) => objeto.condicion === "Aceptado");
 
   const handleDescargarBoleta = () => {
     window.open(
@@ -462,7 +461,7 @@ const Gestion = () => {
           H.T: <span style={{ color: 'red' }}>{periodoActivo.horasTutoriaRes}</span>
         </h5>
         <div>
-          <ExportExcel data={solicitudesAceptadas} fileName="data.csv" />
+          <ExportExcel data={solicitudes} fileName="data.csv" />
         </div>
       </div>
       <div className="row mb-2 justify-content-end">
