@@ -391,7 +391,6 @@ function Cursos() {
                 placeholder="Escribe la carrera del curso"
                 value={carrera}
                 onChange={handleChange}
-                autoComplete="off"
                 required
               />
             </Form.Group>
@@ -403,6 +402,7 @@ function Cursos() {
                 placeholder="Escribe el código del curso"
                 value={codigo}
                 onChange={handleChange}
+                autoComplete="off"
                 required={!id}
               />
             </Form.Group>
