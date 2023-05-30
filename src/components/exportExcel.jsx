@@ -74,14 +74,28 @@ const ExportExcel = ({ data, fileName }) => {
   });
   const headers = order;
   const headerOrder = order2;
+
   const formattedData = [
     headerOrder,
     ...data.map((item, index) => {
       const rowData = headers.map((header) => item[header] ?? "");
       rowData[headers.indexOf("horario")] = horariosList[index]; // Insertar horarioList en la columna de horario
+
+      // Formatear la fecha antes de agregarla a rowData
+      const fecha = item.fecha.toDate();
+      const formattedFecha = `${fecha.getFullYear()}-${padZero(
+        fecha.getMonth() + 1
+      )}-${padZero(fecha.getDate())}`;
+
+      rowData[headers.indexOf("fecha")] = formattedFecha;
       return rowData;
     }),
   ];
+
+  // Función auxiliar para agregar un cero al principio si el número es menor a 10
+  function padZero(number) {
+    return number < 10 ? "0" + number : number;
+  }
 
   const handleDownloadExcel = () => {
     const workbook = XLSX.utils.book_new();
