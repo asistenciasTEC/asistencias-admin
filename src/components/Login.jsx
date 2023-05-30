@@ -29,7 +29,7 @@ const Login = () => {
         setData({ ...data, error: "Todos los campos son obligatorios", loading: false });
       } else {
         try {
-          if (email === "vargasdaniel195@gmail.com") {
+          if (email === "tec.asistencias@gmail.com" || email === "aesquivel@itcr.ac.cr") {
             await signInWithEmailAndPassword(auth, email, password);
             setData({
               email: "",
