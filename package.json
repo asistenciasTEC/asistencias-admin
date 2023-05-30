@@ -1,4 +1,5 @@
 {
+  "homepage": "https://asistenciasTEC.github.io/asistencias-admin",
   "name": "asistencias-admin",
   "version": "0.1.0",
   "private": true,
@@ -7,6 +8,7 @@
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
     "firebase": "^9.17.2",
+    "gh-pages": "^5.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0",
@@ -19,10 +21,12 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "yarn react-scripts start",
+    "predeploy": "yarn build",
+    "deploy": "yarn gh-pages -d build",
+    "build": "yarn react-scripts build",
+    "test": "yarn react-scripts test",
+    "eject": "yarn react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
