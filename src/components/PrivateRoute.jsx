@@ -9,7 +9,7 @@ const PrivateRoute = () => {
             <Outlet />
         </>
     ) : (
-        <Navigate to="/login" />
+        <Navigate to="/asistencias-admin/login" />
     );
 }
 

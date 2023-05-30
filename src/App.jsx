@@ -12,7 +12,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AuthProvider from "./contexts/AuthContext";
 import NotFound from "./components/NotFound";
 import Usuario from './components/Usuario';
-import Footer from './components/footer';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -21,35 +21,33 @@ function App() {
         <Router>
           <Header />
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route exact path="/" element={<PrivateRoute />}>
-              <Route path="/" element={<Inicio />} />
+            <Route path="/asistencias-admin/login" element={<Login />} />
+            <Route exact path="/asistencias-admin/" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/" element={<Inicio />} />
             </Route>
-            <Route exact path="/profesores" element={<PrivateRoute />}>
-              <Route path="/profesores" element={<Profesores />} />
+            <Route exact path="/asistencias-admin/profesores" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/profesores" element={<Profesores />} />
             </Route>
-            <Route exact path="/periodos" element={<PrivateRoute />}>
-              <Route path="/periodos" element={<Periodos />} />
+            <Route exact path="/asistencias-admin/periodos" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/periodos" element={<Periodos />} />
             </Route>
-            <Route exact path="/asistencias" element={<PrivateRoute />}>
-              <Route path="/asistencias" element={<Asistencias />} />
+            <Route exact path="/asistencias-admin/asistencias" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/asistencias" element={<Asistencias />} />
             </Route>
-            <Route exact path="/cursos" element={<PrivateRoute />}>
-              <Route path="/cursos" element={<Cursos />} />
+            <Route exact path="/asistencias-admin/cursos" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/cursos" element={<Cursos />} />
             </Route>
-            <Route exact path="/gestion" element={<PrivateRoute />}>
-              <Route path="/gestion" element={<Gestion />} />
+            <Route exact path="/asistencias-admin/gestion" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/gestion" element={<Gestion />} />
             </Route>
-            <Route exact path="/usuario" element={<PrivateRoute />}>
-              <Route path="/usuario" element={<Usuario />} />
+            <Route exact path="/asistencias-admin/usuario" element={<PrivateRoute />}>
+              <Route path="/asistencias-admin/usuario" element={<Usuario />} />
             </Route>
             <Route exact path="*" element={<NotFound />} />
           </Routes>
-        <Footer/>
         </Router>
+        <Footer />
       </AuthProvider>
-
-
     </>
   );
 }

@@ -26,7 +26,7 @@ function Usuario() {
             try {
                 await updatePassword(usuarioAuthentication, cambioContraseña.confirmacionContraseña);
                 signOut(auth);
-                history("/login");
+                history("/asistencias-admin/login");
             } catch (error) {
                 if (error.code === "auth/requires-recent-login") {
                     toast.error("Error al actualizar la contraseña. Por favor, vuelva a iniciar sesión e inténtelo de nuevo");

@@ -37,7 +37,7 @@ const Login = () => {
               error: null,
               loading: false,
             });
-            history("/");
+            history("/asistencias-admin/");
           } else {
             throw new Error("El correo electrónico no tiene permisos para acceder");
           }

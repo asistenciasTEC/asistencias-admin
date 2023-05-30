@@ -11,11 +11,11 @@ function Header() {
     const { user } = useContext(AuthContext);
     const handleSignout = async () => {
         await signOut(auth);
-        history("/login");
+        history("/asistencias-admin/login");
     }
 
     const handleRoute = () => {
-        history('/usuario');
+        history('/asistencias-admin/usuario');
     };
     return (
         <header className='App-header'>
@@ -24,12 +24,12 @@ function Header() {
                 <div className='Scroll'>
                     {user ? (
                         <>
-                            <Link to="/">Inicio</Link>
-                            <Link to="/profesores">Profesores</Link>
-                            <Link to="/cursos">Cursos</Link>
-                            <Link to="/asistencias">Asistencias</Link>
-                            <Link to="/periodos">Periodos</Link>
-                            <Link to="/gestion">Gestión</Link>
+                            <Link to="/asistencias-admin/">Inicio</Link>
+                            <Link to="/asistencias-admin/profesores">Profesores</Link>
+                            <Link to="/asistencias-admin/cursos">Cursos</Link>
+                            <Link to="/asistencias-admin/asistencias">Asistencias</Link>
+                            <Link to="/asistencias-admin/periodos">Periodos</Link>
+                            <Link to="/asistencias-admin/gestion">Gestión</Link>
                             <MdManageAccounts type="button" className="btnLogin" onClick={handleRoute} />
                             <button type="button" className='btnLogout' onClick={handleSignout}>
                                 <MdLogout />
