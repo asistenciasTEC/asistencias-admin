@@ -7,12 +7,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCNTLVNZoL0QUZtKNT10cZUmVMBKrO8k5o",
-  authDomain: "asistencias-65cba.firebaseapp.com",
-  projectId: "asistencias-65cba",
-  storageBucket: "asistencias-65cba.appspot.com",
-  messagingSenderId: "482185405982",
-  appId: "1:482185405982:web:8d395fea5c1d90a642b00f"
+  apiKey: "AIzaSyBYwEnSyAiulg-Gx3QV1QyR6JYxx4naEfw",
+  authDomain: "tecasistencias-7a664.firebaseapp.com",
+  projectId: "tecasistencias-7a664",
+  storageBucket: "tecasistencias-7a664.appspot.com",
+  messagingSenderId: "614707721976",
+  appId: "1:614707721976:web:1f59e3c12fd562d120ad0d"
 };
 
 // Initialize Firebase
